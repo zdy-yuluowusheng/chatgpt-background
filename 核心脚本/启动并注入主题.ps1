@@ -60,8 +60,8 @@ function Start-CodexWithThemeInjection {
         }
         Write-Host "已定位客户端程序: $exePath" -ForegroundColor Green
 
-        # 2. 检查并处理单实例冲突
-        Write-Host "[2/5] 正在检查进程状态..." -ForegroundColor Gray
+        # 2. 检查并处理单实例与旧守护进程冲突
+        Write-Host "[2/6] 正在检查进程状态并清理旧实例..." -ForegroundColor Gray
         $runningProcesses = Get-Process -Name "ChatGPT", "Codex" -ErrorAction SilentlyContinue
         if ($runningProcesses.Count -gt 0) {
             if ($AutoRestart) {
@@ -75,47 +75,77 @@ function Start-CodexWithThemeInjection {
             }
         }
 
+        # 清理可能残留的旧注入守护进程，避免多进程冲突
+        Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*运行时注入引擎.mjs*" } | ForEach-Object {
+            Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+        }
+
         # 3. 准备专用的受管 CDP 用户数据目录（Chromium 136+ 强约束）
         $projectRoot = Split-Path -Parent $PSScriptRoot
         $profileDir = Join-Path $projectRoot "用户数据\cdp-profile"
         if (-not (Test-Path -Path $profileDir)) {
             New-Item -ItemType Directory -Force -Path $profileDir | Out-Null
         }
-        Write-Host "[3/5] 已就绪受管 CDP Profile 目录: $profileDir" -ForegroundColor Green
+        Write-Host "[3/6] 已就绪受管 CDP Profile 目录: $profileDir" -ForegroundColor Green
 
         # 4. 以注册的 AUMID 应用入口安全启动客户端（彻底消除“该进程没有程序包标识符”报错）
-        Write-Host "[4/5] 正在通过应用注册入口启动客户端 (监听端口: $ListenPort)..." -ForegroundColor Gray
+        Write-Host "[4/6] 正在通过应用注册入口启动客户端 (监听端口: $ListenPort)..." -ForegroundColor Gray
         $aumid = "$($pkg.PackageFamilyName)!App"
         $arguments = "--remote-debugging-port=$ListenPort"
         
         Start-Process -FilePath "shell:AppsFolder\$aumid" -ArgumentList $arguments
-        Start-Sleep -Seconds 3
+        Start-Sleep -Seconds 2
         Write-Host "客户端已安全拉起，已获得官方程序包完整标识符。" -ForegroundColor Green
 
-        # 5. 启动 Node.js 运行时注入引擎
-        Write-Host "[5/5] 正在拉起主题注入守护引擎..." -ForegroundColor Gray
+        # 5. 启动 Node.js 运行时注入引擎 (以隐藏窗口模式静默在后台运行)
+        Write-Host "[5/6] 正在拉起主题注入守护引擎 (后台静默运行，无黑窗口)..." -ForegroundColor Gray
         $injectorScript = Join-Path $PSScriptRoot "运行时注入引擎.mjs"
 
-        # 异步启动注入守护进程
         $injectorProcess = Start-Process -FilePath "node" `
             -ArgumentList "`"$injectorScript`"" `
             -WorkingDirectory $projectRoot `
+            -WindowStyle Hidden `
             -PassThru
 
-        Write-Host "==========================================================" -ForegroundColor Green
-        Write-Host "    ChatGPT / Codex 晨雾森林毛玻璃主题已成功激活！" -ForegroundColor Green
-        Write-Host "==========================================================" -ForegroundColor Green
-        Write-Host "* 注入引擎正在后台持续运行，当页面打开时将自动动态注入毛玻璃样式；" -ForegroundColor White
-        Write-Host "* 支持热重载：修改主题样式目录下的 CSS 或更换壁纸后会自动全量刷新；" -ForegroundColor White
-        Write-Host "* 若要恢复官方原生状态，只需正常从开始菜单打开 ChatGPT 即可！" -ForegroundColor Yellow
-        Write-Host "==========================================================" -ForegroundColor Green
+        # 6. 验证样式是否成功注入生效，确认无误后自动退出窗口
+        Write-Host "[6/6] 正在校验毛玻璃主题挂载状态，确认渲染生效..." -ForegroundColor Gray
+        $checkerScript = Join-Path $PSScriptRoot "检查注入是否就绪.js"
 
-        return $true
+        $verifySuccess = $false
+        $verifyOutput = & node "$checkerScript" 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            $verifySuccess = $true
+        }
+
+        if ($verifySuccess) {
+            Write-Host ""
+            Write-Host "==========================================================" -ForegroundColor Green
+            Write-Host "    [✔ 注入成功] 晨雾森林毛玻璃主题已在客户端完美生效！" -ForegroundColor Green
+            Write-Host "==========================================================" -ForegroundColor Green
+            Write-Host "* 注入引擎正在后台静默守护，支持即时热重载与会话切换保活。" -ForegroundColor Gray
+            Write-Host "* 状态校验确认无误，本窗口将在 2 秒后自动关闭..." -ForegroundColor Cyan
+            Write-Host "==========================================================" -ForegroundColor Green
+            Start-Sleep -Seconds 2
+            return $true
+        } else {
+            Write-Warning "[超时提示] 未能在规定时间内确认主题挂载状态，但客户端已成功拉起。"
+            Write-Host "若界面未显示毛玻璃效果，可尝试在客户端中按 Ctrl+R 刷新。" -ForegroundColor Yellow
+            Write-Host ""
+            Read-Host "按回车键关闭本窗口"
+            return $false
+        }
     }
     catch {
         Write-Error "[异常] 启动注入流程失败：$($_.Exception.Message)"
+        Write-Host ""
+        Read-Host "按回车键关闭本窗口"
         return $false
     }
 }
 
-Start-CodexWithThemeInjection -ListenPort $Port -AutoRestart $RestartExisting
+$success = Start-CodexWithThemeInjection -ListenPort $Port -AutoRestart $RestartExisting
+if ($success) {
+    exit 0
+} else {
+    exit 1
+}

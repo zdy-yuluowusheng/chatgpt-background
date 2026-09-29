@@ -23,7 +23,7 @@ async function capturePageScreenshot(targetUrl = 'app://-/index.html', outputFil
   try {
     const listRes = await fetch(`http://127.0.0.1:${port}/json/list`);
     const targets = await listRes.json();
-    const target = targets.find(t => t.url && t.url.includes(targetUrl));
+    const target = targets.find(t => t.url === targetUrl) || targets.find(t => t.url && t.url.includes(targetUrl) && !t.url.includes('initialRoute'));
     if (!target) {
       throw new Error(`未找到匹配 ${targetUrl} 的页面目标`);
     }
