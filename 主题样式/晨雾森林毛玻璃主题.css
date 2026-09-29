@@ -49,11 +49,12 @@ div[class*="_MainContentTopFade_"],
     pointer-events: none !important;
 }
 
-/* ================= 3. 左侧任务栏/侧边栏纯透明穿透 (与 Antigravity 图二一致) ================= */
+/* ================= 3. 左侧任务栏/侧边栏纯透明穿透与图标高雅雾化 (消除黑底) ================= */
 aside.app-shell-left-panel,
 [data-app-shell-sidebar-root],
 #app-shell-sidebar,
 nav.group\/sidebar-rail,
+nav[class*="sidebar-rail"],
 aside.app-shell-left-panel * {
     background: transparent !important;
     background-color: transparent !important;
@@ -64,16 +65,77 @@ aside.app-shell-left-panel * {
     box-shadow: none !important;
 }
 
-/* 侧边栏列表项目与操作按钮悬停时的柔和微光高亮反馈 */
+/* 彻底清除侧边栏图标默认的实体深黑底色与 ::before / ::after 伪元素暗色遮罩 */
+aside.app-shell-left-panel button,
+[data-app-shell-sidebar-root] button,
+nav[class*="sidebar-rail"] button,
+button[data-sidebar-destination],
+button[data-slot="popover-trigger"],
+button[class*="_Button_f5tnh_2"] {
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+aside.app-shell-left-panel button::before,
+aside.app-shell-left-panel button::after,
+[data-app-shell-sidebar-root] button::before,
+[data-app-shell-sidebar-root] button::after,
+nav[class*="sidebar-rail"] button::before,
+nav[class*="sidebar-rail"] button::after,
+button[data-sidebar-destination]::before,
+button[data-sidebar-destination]::after,
+button[class*="_Button_f5tnh_2"]::before,
+button[class*="_Button_f5tnh_2"]::after {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 侧边栏列表项目与操作按钮悬停 (Hover) 时的通透微光雾化高亮反馈 */
 aside.app-shell-left-panel a:hover,
 aside.app-shell-left-panel button:hover,
 aside.app-shell-left-panel [class*="sidebar-item"]:hover,
 aside.app-shell-left-panel [role="button"]:hover,
 [data-app-shell-sidebar-root] a:hover,
-[data-app-shell-sidebar-root] button:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    border-radius: 8px !important;
-    transition: background-color 0.15s ease !important;
+[data-app-shell-sidebar-root] button:hover,
+nav[class*="sidebar-rail"] button:hover,
+button[data-sidebar-destination]:hover,
+button[class*="_Button_f5tnh_2"]:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    transition: all 0.18s ease-out !important;
+}
+
+/* 侧边栏图标选中 / 激活 / 点击 (Active / Selected) 时的通透雾化高亮效果 */
+aside.app-shell-left-panel button:active,
+[data-app-shell-sidebar-root] button:active,
+nav[class*="sidebar-rail"] button:active,
+button[data-sidebar-destination]:active,
+button[class*="_Button_f5tnh_2"]:active,
+aside.app-shell-left-panel button[data-selected],
+[data-app-shell-sidebar-root] button[data-selected],
+nav[class*="sidebar-rail"] button[data-selected],
+button[data-sidebar-destination][data-selected],
+button[class*="_Button_f5tnh_2"][data-selected],
+aside.app-shell-left-panel button[data-state="open"],
+[data-app-shell-sidebar-root] button[data-state="open"],
+nav[class*="sidebar-rail"] button[data-state="open"],
+button[data-sidebar-destination][data-state="open"],
+button[class*="_Button_f5tnh_2"][data-state="open"],
+aside.app-shell-left-panel button[aria-current="page"],
+button[data-sidebar-destination][aria-current="page"] {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.24) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
 }
 
 /* ================= 4. 顶部导航与会话名称纯透明穿透 ================= */
@@ -236,23 +298,97 @@ code:not([class*="_CodeContent_"], pre code, [class*="_CodeBlock_"] code) {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }
 
-/* ================= 8. 弹窗、下拉菜单与候选项浮层 ================= */
+/* ================= 8. 弹窗、个人资料用量浮层与上下文菜单：透明雾化毛玻璃 ================= */
 [role="menu"],
 [role="dialog"],
-[data-radix-popper-content-wrapper] > div {
-    background-color: rgba(24, 28, 34, 0.88) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 12px !important;
+[data-radix-popper-content-wrapper] > div,
+div[class*="_Popover_"],
+div[data-radix-menu-content] {
+    background-color: rgba(18, 24, 30, 0.52) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    border-radius: 16px !important;
 }
 
-/* 下拉菜单单项悬停高亮 */
+/* 下拉菜单与上下文列表单项悬停高亮 */
 [role="menuitem"]:hover,
 [role="option"]:hover,
-[data-radix-popper-content-wrapper] [role="menuitem"]:hover {
-    background-color: rgba(255, 255, 255, 0.10) !important;
+[role="menuitem"][data-highlighted],
+[data-radix-popper-content-wrapper] [role="menuitem"]:hover,
+[data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    border-radius: 10px !important;
+    transition: background-color 0.15s ease !important;
+}
+
+/* ================= 9. 设置界面全景透明与所有菜单详情卡片透明雾化 ================= */
+/* 设置右侧整体容器穿透透明，消除默认实体黑底 */
+div.electron\:bg-surface,
+div[class*="electron:bg-surface"],
+div[class*="_shell_6317u_2"],
+div[class*="_content_6317u_2"],
+[data-app-shell-focus-area="main"] > div {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* 设置界面内所有详情分组卡片（常规、权限、通知、快捷键、编辑器等所有子页面的详情卡片） */
+.group\/settings div.rounded-2xl:has([class*="settings-row"]),
+div[class*="group/settings"] div.rounded-2xl:has([class*="settings-row"]),
+section div.rounded-2xl:has([class*="settings-row"]),
+div.rounded-2xl.overflow-hidden.border.border-default,
+div.rounded-2xl:has(> [class*="@container/settings-row"]),
+div[class*="group-data-[density=compact]/settings"].rounded-2xl {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 确保卡片内部各行保持纯透明，消除行内多余的子级背景 */
+[class*="@container/settings-row"],
+[class*="settings-row"],
+[class*="settings-row"] > div {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* 设置卡片内部行之间的分割微光线 */
+div:has(> [class*="@container/settings-row"]) > *:not(:last-child)::after {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 设置卡片内的次级下拉框与按钮透明化微光 */
+div[class*="settings-row"] button[class*="button-toolbar"],
+div[class*="settings-row"] [class*="_ComposerFooterDropdown_"],
+div[class*="settings-row"] button[class*="rounded-button-toolbar"] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-radius: 8px !important;
+}
+
+div[class*="settings-row"] button[class*="button-toolbar"]:hover {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    border-color: rgba(255, 255, 255, 0.20) !important;
+}
+
+/* 设置界面左侧菜单项选中与悬停微光胶囊 */
+button.sidebar-item.bg-primary-ghost-hover,
+button.sidebar-item[aria-current="page"] {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border-radius: 8px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+button.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
     border-radius: 8px !important;
 }
 
@@ -274,3 +410,193 @@ code:not([class*="_CodeContent_"], pre code, [class*="_CodeBlock_"] code) {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.32) !important;
 }
+
+/* ================= 9. 全局悬停 Tooltip 提示浮层与气泡透明雾化 (彻底消除黑底) ================= */
+:root,
+html,
+body {
+    --color-background-tooltip: rgba(18, 24, 30, 0.65) !important;
+    --color-border-tooltip: rgba(255, 255, 255, 0.18) !important;
+    --color-text-tooltip: #ffffff !important;
+    --shadow-tooltip: 0 8px 24px rgba(0, 0, 0, 0.40) !important;
+}
+
+[role="tooltip"],
+div[role="tooltip"],
+[data-radix-popper-content-wrapper] [role="tooltip"],
+div[class*="bg-(--color-background-tooltip)"],
+div[class*="border-(color:--color-border-tooltip)"],
+div[class*="_textTheme_"][role="tooltip"] {
+    background-color: rgba(18, 24, 30, 0.65) !important;
+    background: rgba(18, 24, 30, 0.65) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+}
+
+/* Tooltip 内部文本、图标及快捷键小徽章微光渲染 */
+[role="tooltip"] * {
+    background-color: transparent !important;
+    color: #ffffff !important;
+}
+
+[role="tooltip"] kbd,
+[role="tooltip"] [class*="kbd"],
+[role="tooltip"] [class*="shortcut"] {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.20) !important;
+    border-radius: 6px !important;
+    padding: 1px 5px !important;
+    font-size: 11px !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* ================= 10. 顶部应用菜单栏与返回按钮悬停透明雾化微光 ================= */
+/* 顶部菜单栏按钮（文件、编辑、视图、帮助） */
+#application-menu-trigger-file-menu,
+#application-menu-trigger-edit-menu,
+#application-menu-trigger-view-menu,
+#application-menu-trigger-help-menu {
+    transition: all 0.18s ease-out !important;
+}
+
+#application-menu-trigger-file-menu:hover,
+#application-menu-trigger-edit-menu:hover,
+#application-menu-trigger-view-menu:hover,
+#application-menu-trigger-help-menu:hover,
+#application-menu-trigger-file-menu[data-state="open"],
+#application-menu-trigger-edit-menu[data-state="open"],
+#application-menu-trigger-view-menu[data-state="open"],
+#application-menu-trigger-help-menu[data-state="open"],
+#application-menu-trigger-file-menu:focus-visible,
+#application-menu-trigger-edit-menu:focus-visible,
+#application-menu-trigger-view-menu:focus-visible,
+#application-menu-trigger-help-menu:focus-visible {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+}
+
+/* 顶部点击弹出的应用菜单下拉浮层透明毛玻璃美化 */
+[id*="application-menu-content"],
+div[data-radix-menu-content] {
+    background-color: rgba(18, 24, 30, 0.65) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+}
+
+/* 左上角返回/前进按钮与顶部拖拽条按钮悬停微光 */
+button.button-toolbar.ms-3,
+button.rounded-button-toolbar.ms-3,
+div.draggable button.button-toolbar,
+button[class*="rounded-button-toolbar"] {
+    transition: all 0.18s ease-out !important;
+}
+
+button.button-toolbar.ms-3:hover,
+button.button-toolbar.ms-3[data-state="open"],
+div.draggable button.button-toolbar:hover,
+button[class*="rounded-button-toolbar"]:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+}
+
+/* ================= 11. 资料库与插件 (Customize) 页面全局透明穿透与头部横条黑底消除 ================= */
+/* 彻底清除资料库与插件/自定义页面顶部横条纯黑实体背景与 ::before / ::after 伪元素暗色遮罩 */
+div[class*="_shell_6317u_"],
+div[class*="_shell_6317u_"]::before,
+div[class*="_shell_6317u_"]::after,
+header[class*="_shell_6317u_"],
+header[class*="_shell_6317u_"]::before,
+header[class*="_shell_6317u_"]::after,
+div[class*="_title_6317u_"],
+div[class*="_content_6317u_"],
+div[class*="_titleContent_6317u_"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
+/* 顶部搜索输入框（搜索资料库、搜索插件）微光半透明高雅美化 */
+div[class*="_shell_6317u_"] input,
+div[class*="_content_6317u_"] input {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 9999px !important;
+    color: #ffffff !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+div[class*="_shell_6317u_"] input:focus,
+div[class*="_content_6317u_"] input:focus {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* 顶部次级操作按钮（网格/列表切换、刷新、设置、筛选等）微光半透明美化 */
+div[class*="_shell_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]),
+div[class*="_content_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]) {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+div[class*="_shell_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
+div[class*="_content_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    border-color: rgba(255, 255, 255, 0.20) !important;
+}
+
+/* 资料库与插件主操作高亮按钮（新建、添加）高保真微光白胶囊 */
+div[class*="_shell_6317u_"] button[class*="bg-primary-solid"],
+div[class*="_content_6317u_"] button[class*="bg-primary-solid"] {
+    background-color: rgba(255, 255, 255, 0.90) !important;
+    color: #120e16 !important;
+    border: 1px solid rgba(255, 255, 255, 0.40) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    font-weight: 500 !important;
+}
+
+div[class*="_shell_6317u_"] button[class*="bg-primary-solid"]:hover,
+div[class*="_content_6317u_"] button[class*="bg-primary-solid"]:hover {
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* 分类切换胶囊（推荐、收藏、文件夹、图像、全部 / 公开、个人）微光质感 */
+div[class*="_shell_6317u_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]),
+div[class*="_content_6317u_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]) {
+    border-radius: 9999px !important;
+    transition: all 0.15s ease-out !important;
+}
+
+div[class*="_shell_6317u_"] button[class*="bg-primary-ghost-hover"],
+div[class*="_content_6317u_"] button[class*="bg-primary-ghost-hover"] {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+}
+
+
