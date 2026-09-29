@@ -1,0 +1,24 @@
+{
+  "themeName": "晨雾森林毛玻璃主题",
+  "version": "1.0.0",
+  "author": "Antigravity Assistant",
+  "targetApp": "OpenAI Codex / ChatGPT Desktop",
+  "settings": {
+    "maskDarkness": 0.50,
+    "blurRadius": "16px",
+    "sidebarBlur": "16px",
+    "composerBlur": "20px",
+    "cdpPort": 9335,
+    "cdpAddress": "127.0.0.1",
+    "autoInjectOnNavigation": true,
+    "pollIntervalMs": 1500
+  },
+  "selectors": {
+    "mainSurface": "main:is(.main-surface, [data-app-shell-main-surface], [class*='_MainContentSurface_'])",
+    "leftSidebar": "aside.app-shell-left-panel",
+    "header": "header:is(.app-header-tint, [data-app-shell-header-edge-scroll], [class*='_Header_'])",
+    "composerRoot": ":is(.composer-surface-chrome, [class*='_ComposerLayoutRoot_'], [data-composer-surface-variant][data-composer-radius-variant])",
+    "threadSurface": ".thread-scroll-container",
+    "messageBoundaries": ":is([data-message-author-role], [data-local-conversation-user-anchor], [data-local-conversation-final-assistant])"
+  }
+}
