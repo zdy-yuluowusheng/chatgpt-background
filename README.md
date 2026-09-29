@@ -213,6 +213,7 @@ node .\调试与探查工具\截取输入框特写截图.js
 | **06** | **输入框发暗死沉 vs 泛白刺眼失衡** | 输入框直接纯透时因背景松林偏暗造成 20% 暗沉感；强行加白底则反光严重造成 70% 刺眼，文字极难阅读 | **创新研发 45%~50% 黄金光比算法**：`rgba(14, 22, 19, 0.24)` + `blur(12px) brightness(108%) saturate(125%)` + 壁纸 `center 62%` 偏置，兼备极高可读性与晶莹通透感 |
 | **07** | **Chromium 136+ CDP 端口静默失效** | Chromium 136+ 引入严格安全策略，若在默认用户目录下带 `--remote-debugging-port` 启动，调试端口会被内核静默忽略 | 在启动脚本中显式配置独立的 `--user-data-dir="用户数据\cdp-profile"` 受管隔离目录，确保 9335 调试端口 100% 稳定开放 |
 | **08** | **界面路由切换后主题偶发脱落** | 桌面端单页应用（SPA）在路由跳转与新建对话时会清空或重构头部 DOM | 注入引擎建立常驻 ID（`__chatgpt_codex_custom_theme_style__`）样式节点，并持续监听 `Page.navigatedWithinDocument` 与 `Page.loadEventFired` 进行自动化重注入补正 |
+| **09** | **初始主页 (Home) 输入框黑底不透明** | 初始聊天页（`data-composer-utility-bar-variant="home"`）内部的 `_ComposerLayoutBody_` 节点自带原生 `rgb(46, 42, 50)` 实体背景与内阴影，挡住了外层的毛玻璃滤镜 | 精确穿透 `:is([class*="_ComposerLayoutBody_"], [data-composer-body])` 并设为透明与清除阴影，实现初始主页与项目会话页毛玻璃雾化 100% 统一 |
 
 ---
 

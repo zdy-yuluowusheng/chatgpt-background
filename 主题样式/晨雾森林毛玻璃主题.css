@@ -113,6 +113,13 @@ div[class*="_ApplicationMenuTopBar_"] * {
     box-shadow: 0 8px 36px 0 rgba(0, 0, 0, 0.30), 0 0 0 1px rgba(255, 255, 255, 0.18) !important;
 }
 
+/* 输入框内部主体容器透明化 (消除初始主页 Home 默认实体黑底，与会话内毛玻璃雾化统一) */
+:is([class*="_ComposerLayoutBody_"], [data-composer-body]) {
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
 /* 输入框底部工具栏与操作按钮条保持透明 */
 :is(.composer-surface-chrome [class*="_footer_"], [class*="_ComposerLayoutRoot_"] [class*="_ComposerLayoutFooter_"]) {
     background-color: transparent !important;
