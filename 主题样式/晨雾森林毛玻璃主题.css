@@ -189,13 +189,101 @@ div[class*="_ApplicationMenuTopBar_"] * {
     border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
-/* 消除输入框底部外围宿主遮罩与底层暗色渐变，实现通透雾化 */
+/* 消除输入框底部外围宿主遮罩与底层暗色实体背景，实现会话页面底部全景通透雾化 (彻底消除黑底) */
 [data-thread-scroll-footer],
 div:is([class*="bg-gradient-to-t"], [class*="from-surface"]),
-div[class*="from-surface-secondary"] {
+div[class*="from-surface-secondary"],
+div[class*="pointer-events-none"][class*="inset-x-0"]:is([class*="bg-surface"], [class*="-top-8"], [class*="bottom-0"]),
+[class*="thread-scroll-layout"] div:has(> [data-codex-composer-root]),
+[class*="thread-scroll-layout"] div[class*="pointer-events-none"][class*="bottom-0"],
+[class*="thread-scroll-layout"] div[class*="pointer-events-none"][class*="bg-surface"] {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
+}
+
+/* 初始主界面输入框上方操作条（选择项目、本地模式、分支等）透明毛玻璃微光 (消除黑底) */
+div[data-composer-rail] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+
+:is([data-composer-rail-item], div[class*="_item_1hrlq_"], div[class*="bg-background-composer-action-bar"], div[data-composer-rail-placement="above"]) {
+    background-color: rgba(14, 22, 19, 0.28) !important;
+    background: rgba(14, 22, 19, 0.28) !important;
+    backdrop-filter: blur(14px) saturate(125%) brightness(108%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(125%) brightness(108%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 分支操作栏内部按钮悬停微光反馈 */
+:is([data-composer-rail-item], div[class*="_item_1hrlq_"]) button:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 额度限制/速率限制通知卡片（Codex 和工作使用额度已用完提示条）高级毛玻璃雾化微光胶囊 (消除黑底) */
+aside[role="status"],
+aside[class*="_banner_"] {
+    background-color: rgba(18, 24, 28, 0.48) !important;
+    background: rgba(18, 24, 28, 0.48) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+    border-radius: 28px !important;
+}
+
+aside[role="status"] button,
+aside[class*="_banner_"] button {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* 额度卡片内“重置使用量”按钮微光通透胶囊 */
+aside[role="status"] button:not([class*="blue"]),
+aside[class*="_banner_"] button:not([class*="blue"]) {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+}
+
+aside[role="status"] button:not([class*="blue"]):hover,
+aside[class*="_banner_"] button:not([class*="blue"]):hover {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* 额度卡片内“升级”高亮按钮微亮蓝光通透胶囊 */
+aside[role="status"] button[class*="blue"],
+aside[class*="_banner_"] button[class*="blue"] {
+    background-color: rgba(30, 100, 220, 0.35) !important;
+    border: 1px solid rgba(120, 180, 255, 0.35) !important;
+    box-shadow: 0 2px 12px rgba(0, 100, 255, 0.25) !important;
+    color: #e5f3ff !important;
+}
+
+aside[role="status"] button[class*="blue"]:hover,
+aside[class*="_banner_"] button[class*="blue"]:hover {
+    background-color: rgba(30, 120, 255, 0.50) !important;
+    border-color: rgba(150, 200, 255, 0.50) !important;
+}
+
+/* 会话悬浮滚动到底部按钮毛玻璃胶囊 */
+button:is([class*="scroll-to-bottom"], .group\/scroll-to-bottom) {
+    background-color: rgba(18, 24, 30, 0.65) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+button:is([class*="scroll-to-bottom"], .group\/scroll-to-bottom):hover {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
 /* ================= 6. 纯文字消息纯透明穿透 (消除双层外框，与 Antigravity 一致) ================= */
