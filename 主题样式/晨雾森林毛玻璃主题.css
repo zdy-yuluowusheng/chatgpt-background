@@ -71,7 +71,7 @@ aside.app-shell-left-panel button,
 nav[class*="sidebar-rail"] button,
 button[data-sidebar-destination],
 button[data-slot="popover-trigger"],
-button[class*="_Button_f5tnh_2"] {
+button[class*="_Button_"] {
     background-color: transparent !important;
     background: transparent !important;
     box-shadow: none !important;
@@ -85,8 +85,8 @@ nav[class*="sidebar-rail"] button::before,
 nav[class*="sidebar-rail"] button::after,
 button[data-sidebar-destination]::before,
 button[data-sidebar-destination]::after,
-button[class*="_Button_f5tnh_2"]::before,
-button[class*="_Button_f5tnh_2"]::after {
+button[class*="_Button_"]::before,
+button[class*="_Button_"]::after {
     background: transparent !important;
     background-color: transparent !important;
     box-shadow: none !important;
@@ -101,7 +101,7 @@ aside.app-shell-left-panel [role="button"]:hover,
 [data-app-shell-sidebar-root] button:hover,
 nav[class*="sidebar-rail"] button:hover,
 button[data-sidebar-destination]:hover,
-button[class*="_Button_f5tnh_2"]:hover {
+button[class*="_Button_"]:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
@@ -116,17 +116,17 @@ aside.app-shell-left-panel button:active,
 [data-app-shell-sidebar-root] button:active,
 nav[class*="sidebar-rail"] button:active,
 button[data-sidebar-destination]:active,
-button[class*="_Button_f5tnh_2"]:active,
+button[class*="_Button_"]:active,
 aside.app-shell-left-panel button[data-selected],
 [data-app-shell-sidebar-root] button[data-selected],
 nav[class*="sidebar-rail"] button[data-selected],
 button[data-sidebar-destination][data-selected],
-button[class*="_Button_f5tnh_2"][data-selected],
+button[class*="_Button_"][data-selected],
 aside.app-shell-left-panel button[data-state="open"],
 [data-app-shell-sidebar-root] button[data-state="open"],
 nav[class*="sidebar-rail"] button[data-state="open"],
 button[data-sidebar-destination][data-state="open"],
-button[class*="_Button_f5tnh_2"][data-state="open"],
+button[class*="_Button_"][data-state="open"],
 aside.app-shell-left-panel button[aria-current="page"],
 button[data-sidebar-destination][aria-current="page"] {
     background-color: rgba(255, 255, 255, 0.18) !important;
@@ -202,14 +202,9 @@ div[class*="pointer-events-none"][class*="inset-x-0"]:is([class*="bg-surface"], 
     background-image: none !important;
 }
 
-/* 初始主界面输入框上方操作条（选择项目、本地模式、分支等）透明毛玻璃微光 (消除黑底) */
-div[data-composer-rail] {
-    background: transparent !important;
-    background-color: transparent !important;
-    border-color: transparent !important;
-}
-
-:is([data-composer-rail-item], div[class*="_item_1hrlq_"], div[class*="bg-background-composer-action-bar"], div[data-composer-rail-placement="above"]) {
+/* 初始主界面输入框上方操作条（选择项目、本地模式、分支等）：只保留外层高雅圆角长方形毛玻璃微光胶囊 (消除双层内外框重叠) */
+div[data-composer-rail],
+div[data-composer-rail-placement="above"] {
     background-color: rgba(14, 22, 19, 0.28) !important;
     background: rgba(14, 22, 19, 0.28) !important;
     backdrop-filter: blur(14px) saturate(125%) brightness(108%) !important;
@@ -217,10 +212,36 @@ div[data-composer-rail] {
     border: 1px solid rgba(255, 255, 255, 0.16) !important;
     border-radius: 14px !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    padding: 4px 8px !important;
+    margin-bottom: 8px !important;
+    height: auto !important;
+    overflow: hidden !important;
+}
+
+/* 消除原生外层 ::after 伪元素遮罩 */
+div[data-composer-rail]::after,
+div[data-composer-rail-placement="above"]::after {
+    display: none !important;
+}
+
+/* 内部所有项目层与包装容器：彻底消除内层边框、背景、圆角与阴影，实现干净纯粹的单层视觉效果 */
+div[data-composer-rail] :is([data-composer-rail-item], div[class*="_item_"], div[class*="bg-background-composer-action-bar"]),
+:is([data-composer-rail-item], div[class*="_item_"], div[class*="bg-background-composer-action-bar"]) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
 }
 
 /* 分支操作栏内部按钮悬停微光反馈 */
-:is([data-composer-rail-item], div[class*="_item_1hrlq_"]) button:hover {
+div[data-composer-rail] button:hover,
+[data-composer-rail-item] button:hover,
+:is([data-composer-rail-item], div[class*="_item_"]) button:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
@@ -415,8 +436,8 @@ div[data-radix-menu-content] {
 /* 设置右侧整体容器穿透透明，消除默认实体黑底 */
 div.electron\:bg-surface,
 div[class*="electron:bg-surface"],
-div[class*="_shell_6317u_2"],
-div[class*="_content_6317u_2"],
+div[class*="_shell_"],
+div[class*="_shell_"] div[class*="_content_"],
 [data-app-shell-focus-area="main"] > div {
     background-color: transparent !important;
     background: transparent !important;
@@ -606,15 +627,21 @@ button[class*="rounded-button-toolbar"]:hover {
 
 /* ================= 11. 资料库与插件 (Customize) 页面全局透明穿透与头部横条黑底消除 ================= */
 /* 彻底清除资料库与插件/自定义页面顶部横条纯黑实体背景与 ::before / ::after 伪元素暗色遮罩 */
-div[class*="_shell_6317u_"],
-div[class*="_shell_6317u_"]::before,
-div[class*="_shell_6317u_"]::after,
-header[class*="_shell_6317u_"],
-header[class*="_shell_6317u_"]::before,
-header[class*="_shell_6317u_"]::after,
-div[class*="_title_6317u_"],
-div[class*="_content_6317u_"],
-div[class*="_titleContent_6317u_"] {
+div[class*="_shell_"],
+div[class*="_shell_"]::before,
+div[class*="_shell_"]::after,
+header[class*="_shell_"],
+header[class*="_shell_"]::before,
+header[class*="_shell_"]::after,
+div[class*="_headerRow_"],
+div[class*="_headerRow_"]::before,
+div[class*="_headerRow_"]::after,
+div[class*="_title_"],
+div[class*="_titleContent_"],
+div[class*="_actions_"],
+div[class*="_toolbar_"],
+div[class*="_search_"],
+div[class*="_shell_"] div[class*="_content_"] {
     background: transparent !important;
     background-color: transparent !important;
     backdrop-filter: none !important;
@@ -624,8 +651,9 @@ div[class*="_titleContent_6317u_"] {
 }
 
 /* 顶部搜索输入框（搜索资料库、搜索插件）微光半透明高雅美化 */
-div[class*="_shell_6317u_"] input,
-div[class*="_content_6317u_"] input {
+div[class*="_shell_"] input,
+div[class*="_search_"] input,
+div[class*="_shell_"] div[class*="_content_"] input {
     background-color: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-radius: 9999px !important;
@@ -634,30 +662,36 @@ div[class*="_content_6317u_"] input {
     -webkit-backdrop-filter: blur(12px) !important;
 }
 
-div[class*="_shell_6317u_"] input:focus,
-div[class*="_content_6317u_"] input:focus {
+div[class*="_shell_"] input:focus,
+div[class*="_search_"] input:focus,
+div[class*="_shell_"] div[class*="_content_"] input:focus {
     background-color: rgba(255, 255, 255, 0.14) !important;
     border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
 /* 顶部次级操作按钮（网格/列表切换、刷新、设置、筛选等）微光半透明美化 */
-div[class*="_shell_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]),
-div[class*="_content_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]) {
+div[class*="_shell_"] button.button-toolbar:not([class*="bg-primary-solid"]),
+div[class*="_toolbar_"] button.button-toolbar:not([class*="bg-primary-solid"]),
+div[class*="_actions_"] button.button-toolbar:not([class*="bg-primary-solid"]),
+div[class*="_shell_"] div[class*="_content_"] button.button-toolbar:not([class*="bg-primary-solid"]) {
     background-color: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
 }
 
-div[class*="_shell_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
-div[class*="_content_6317u_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover {
+div[class*="_shell_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
+div[class*="_toolbar_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
+div[class*="_actions_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
+div[class*="_shell_"] div[class*="_content_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover {
     background-color: rgba(255, 255, 255, 0.16) !important;
     border-color: rgba(255, 255, 255, 0.20) !important;
 }
 
 /* 资料库与插件主操作高亮按钮（新建、添加）高保真微光白胶囊 */
-div[class*="_shell_6317u_"] button[class*="bg-primary-solid"],
-div[class*="_content_6317u_"] button[class*="bg-primary-solid"] {
+div[class*="_shell_"] button[class*="bg-primary-solid"],
+div[class*="_actions_"] button[class*="bg-primary-solid"],
+div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-solid"] {
     background-color: rgba(255, 255, 255, 0.90) !important;
     color: #120e16 !important;
     border: 1px solid rgba(255, 255, 255, 0.40) !important;
@@ -665,21 +699,22 @@ div[class*="_content_6317u_"] button[class*="bg-primary-solid"] {
     font-weight: 500 !important;
 }
 
-div[class*="_shell_6317u_"] button[class*="bg-primary-solid"]:hover,
-div[class*="_content_6317u_"] button[class*="bg-primary-solid"]:hover {
+div[class*="_shell_"] button[class*="bg-primary-solid"]:hover,
+div[class*="_actions_"] button[class*="bg-primary-solid"]:hover,
+div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-solid"]:hover {
     background-color: #ffffff !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
 }
 
 /* 分类切换胶囊（推荐、收藏、文件夹、图像、全部 / 公开、个人）微光质感 */
-div[class*="_shell_6317u_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]),
-div[class*="_content_6317u_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]) {
+div[class*="_shell_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]),
+div[class*="_shell_"] div[class*="_content_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]) {
     border-radius: 9999px !important;
     transition: all 0.15s ease-out !important;
 }
 
-div[class*="_shell_6317u_"] button[class*="bg-primary-ghost-hover"],
-div[class*="_content_6317u_"] button[class*="bg-primary-ghost-hover"] {
+div[class*="_shell_"] button[class*="bg-primary-ghost-hover"],
+div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-ghost-hover"] {
     background-color: rgba(255, 255, 255, 0.14) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
