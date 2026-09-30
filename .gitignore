@@ -8,6 +8,9 @@ Thumbs.db
 *.tmp
 *.bak
 *.log
+__pycache__/
+*.py[cod]
+*$py.class
 
 # 编辑器与 IDE 配置
 .vscode/
