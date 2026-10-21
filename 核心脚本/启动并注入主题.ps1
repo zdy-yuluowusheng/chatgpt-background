@@ -120,7 +120,7 @@ function Start-CodexWithThemeInjection {
         if ($verifySuccess) {
             Write-Host ""
             Write-Host "==========================================================" -ForegroundColor Green
-            Write-Host "    [✔ 注入成功] 晨雾森林毛玻璃主题已在客户端完美生效！" -ForegroundColor Green
+            Write-Host "    [✔ 注入成功] 透明UI主题已在客户端完美生效！" -ForegroundColor Green
             Write-Host "==========================================================" -ForegroundColor Green
             Write-Host "* 注入引擎正在后台静默守护，支持即时热重载与会话切换保活。" -ForegroundColor Gray
             Write-Host "* 状态校验确认无误，本窗口将在 2 秒后自动关闭..." -ForegroundColor Cyan

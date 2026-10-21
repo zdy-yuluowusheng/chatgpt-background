@@ -54,7 +54,7 @@ function Invoke-WallpaperReplacement {
         }
 
         Write-Host "==========================================================" -ForegroundColor Cyan
-        Write-Host "    ChatGPT / Codex 晨雾森林壁纸一键更换工具" -ForegroundColor Cyan
+        Write-Host "    ChatGPT / Codex 透明UI主题壁纸一键更换工具" -ForegroundColor Cyan
         Write-Host "==========================================================" -ForegroundColor Cyan
         Write-Host "目标壁纸: $TargetImage" -ForegroundColor Gray
         Write-Host "暗化遮罩: $DarkenOpacity" -ForegroundColor Gray

@@ -19,7 +19,7 @@ const CONFIG = {
   host: '127.0.0.1',
   pollIntervalMs: 2000,
   styleId: '__chatgpt_codex_custom_theme_style__',
-  cssPath: path.resolve(__dirname, '../主题样式/晨雾森林毛玻璃主题.css'),
+  cssPath: path.resolve(__dirname, '../主题样式/透明UI主题.css'),
 };
 
 /**

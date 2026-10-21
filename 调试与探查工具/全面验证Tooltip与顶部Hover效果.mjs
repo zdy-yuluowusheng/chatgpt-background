@@ -125,7 +125,7 @@ async function captureScreenshot(outputPath, port = 9335) {
  * @returns {Promise<void>}
  */
 async function main() {
-  const cssPath = path.resolve(__dirname, '../主题样式/晨雾森林毛玻璃主题.css');
+  const cssPath = path.resolve(__dirname, '../主题样式/透明UI主题.css');
   const cssContent = fs.readFileSync(cssPath, 'utf-8');
 
   // 1. 将最新样式强行热注入到页面中的 #antigravity-custom-theme 节点

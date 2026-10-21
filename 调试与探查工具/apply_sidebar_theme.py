@@ -5,7 +5,7 @@ import os
 import asyncio
 from cdp_helper import get_page_ws_url, evaluate_script, capture_screen
 
-CSS_FILE_PATH = r"d:\work\chatgpt-background\主题样式\晨雾森林毛玻璃主题.css"
+CSS_FILE_PATH = r"d:\work\chatgpt-background\主题样式\透明UI主题.css"
 
 SECTION_CONTENT = """
 
@@ -180,7 +180,7 @@ div:has(> iframe) {
 
 def update_css_file() -> None:
     """
-    检查并向晨雾森林毛玻璃主题.css中追加第12节右侧边栏全景透明规则。
+    检查并向透明UI主题.css中追加第12节右侧边栏全景透明规则。
 
     :return: None
     :raises IOError: 当文件写入失败时抛出

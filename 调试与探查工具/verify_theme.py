@@ -97,6 +97,6 @@ async def reload_theme_and_capture(ws_url: str, css_file_path: str) -> None:
 if __name__ == "__main__":
     url = get_page_ws_url()
     if url:
-        asyncio.run(reload_theme_and_capture(url, r"d:\work\chatgpt-background\主题样式\晨雾森林毛玻璃主题.css"))
+        asyncio.run(reload_theme_and_capture(url, r"d:\work\chatgpt-background\主题样式\透明UI主题.css"))
     else:
         print("未找到活动窗口")

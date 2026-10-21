@@ -86,7 +86,7 @@ module.exports = { replaceWallpaper };
 if (require.main === module) {
   const args = process.argv.slice(2);
   const defaultImg = path.join(__dirname, '..', '主题样式', '壁纸原图.jpg');
-  const defaultCss = path.join(__dirname, '..', '主题样式', '晨雾森林毛玻璃主题.css');
+  const defaultCss = path.join(__dirname, '..', '主题样式', '透明UI主题.css');
 
   const targetImage = args[0] ? path.resolve(args[0]) : defaultImg;
   const opacity = args[1] !== undefined ? parseFloat(args[1]) : 0.50;

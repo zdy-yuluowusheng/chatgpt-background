@@ -117,7 +117,7 @@ async function hoverAndCapture(x, y, outputPath, waitMs = 1000, port = 9335) {
  * @returns {Promise<void>}
  */
 async function main() {
-  const cssPath = path.resolve(__dirname, '../主题样式/晨雾森林毛玻璃主题.css');
+  const cssPath = path.resolve(__dirname, '../主题样式/透明UI主题.css');
   const cssContent = fs.readFileSync(cssPath, 'utf-8');
 
   // 1. 注入最新主题样式

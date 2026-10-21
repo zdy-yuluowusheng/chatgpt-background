@@ -95,7 +95,7 @@ async function captureScreenshot(fileName, port = 9335) {
  * @returns {Promise<void>}
  */
 async function main() {
-  const cssPath = path.resolve(__dirname, '../主题样式/晨雾森林毛玻璃主题.css');
+  const cssPath = path.resolve(__dirname, '../主题样式/透明UI主题.css');
   const cssContent = fs.readFileSync(cssPath, 'utf-8');
 
   // 1. 清理临时标签并注入正式主题

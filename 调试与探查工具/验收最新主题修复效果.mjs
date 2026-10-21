@@ -1,6 +1,6 @@
 /**
  * @file 验收最新主题修复效果.mjs
- * @description 移除所有临时补丁，全量同步最新《晨雾森林毛玻璃主题.css》，
+ * @description 移除所有临时补丁，全量同步最新《透明UI主题.css》，
  *              分别对初始主页与具体项目会话页截取全景高分辨率验收截图，
  *              验证三处黑底问题是否已彻底得到完美解决。
  * @author Antigravity Assistant
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const themeCssPath = path.resolve(__dirname, '../主题样式/晨雾森林毛玻璃主题.css');
+const themeCssPath = path.resolve(__dirname, '../主题样式/透明UI主题.css');
 
 /**
  * 获取主窗口的 CDP WebSocket 调试地址

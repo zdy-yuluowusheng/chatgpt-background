@@ -7,7 +7,7 @@
 ![Injection Engine](https://img.shields.io/badge/Engine-CDP%20In--Memory-brightgreen?style=flat-square)
 ![Architecture](https://img.shields.io/badge/Architecture-Zero--Invasive%20MSIX-orange?style=flat-square)
 ![Script](https://img.shields.io/badge/Script-PowerShell%20%7C%20Node.js-purple?style=flat-square&logo=powershell)
-![Theme](https://img.shields.io/badge/Theme-晨雾森林%20(Morning%20Mist)-teal?style=flat-square)
+![Theme](https://img.shields.io/badge/Theme-透明UI-teal?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 **专为 OpenAI ChatGPT 与 Codex 桌面客户端量身打造的 0 侵入毛玻璃主题注入引擎、高透晨雾森林预设、无损壁纸转码与热重载工具链**
@@ -30,7 +30,7 @@
 
 **本项目提供了一套完整的现代工程化落地方案**：
 * 🚀 **0 侵入式 CDP 运行时挂载**：基于 Chrome DevTools Protocol（远程调试端口 9335）建立本地 WebSocket 动态通道，在内存中完成 CSS 样式树的热挂载。**不修改任何客户端文件、不破坏商店签名、完全免疫官方自动更新**；
-* 🌲 **晨雾森林极致毛玻璃主题**：通过深度 CSS 穿透与选择器契约，实现侧边栏纯透明、顶部会话栏无遮罩、代码块精致微光高透，以及输入框 **45%~50% 黄金平衡透光档位**；
+* 🌲 **透明UI主题**：通过深度 CSS 穿透与选择器契约，实现侧边栏纯透明、顶部会话栏无遮罩、代码块精致微光高透，以及输入框 **45%~50% 黄金平衡透光档位**；
 * 🖼️ **全自动壁纸转码与热重载**：支持任意 4K 图片一键转码为 Base64 Data URL 内联，彻底规避 Chromium 本地协议跨域沙箱限制，保存样式文件瞬间即可在客户端无感热重载；
 * 🔬 **20+ 逆向与自动化探针工具**：内建完整的 DOM 计算样式探查、哈希选择器解析、特写视口捕获与自动化截图比对工具链；
 * ⚡ **极速还原能力**：无需任何反安装或文件还原操作，直接从系统开始菜单启动客户端即可 100% 恢复官方原生纯净状态。
@@ -85,7 +85,7 @@ d:\work\chatgpt-background\
 ├── .gitignore                                # Git 忽略配置（已忽略大图与运行时数据）
 │
 ├── 主题样式\                                 # 核心样式表与壁纸资产
-│   ├── 晨雾森林毛玻璃主题.css                # 深度优化的毛玻璃主题样式文件（核心 CSS）
+│   ├── 透明UI主题.css                # 深度优化的毛玻璃主题样式文件（核心 CSS）
 │   ├── 壁纸原图.jpg                          # 2560x1440 晨雾松林标准高清壁纸原图
 │   └── 主题配置.json                         # 主题预设参数（暗化度、模糊半径与选择器映射表）
 │
@@ -181,7 +181,7 @@ powershell -ExecutionPolicy Bypass -File .\核心脚本\一键更换背景壁纸
 ---
 
 ### 2. 微调主题样式（即时热重载）
-直接用代码编辑器打开 [`主题样式/晨雾森林毛玻璃主题.css`](file:///d:/work/chatgpt-background/主题样式/晨雾森林毛玻璃主题.css)：
+直接用代码编辑器打开 [`主题样式/透明UI主题.css`](file:///d:/work/chatgpt-background/主题样式/透明UI主题.css)：
 * **调节侧边栏微光度**：修改 `aside.app-shell-left-panel` 下的微光参数；
 * **调节输入框透光与模糊**：修改 `composer-surface-chrome` 中的 `backdrop-filter: blur(12px) brightness(108%)`；
 * **调节代码块背景微光**：修改 `div[class*="_CodeBlock_"]` 中的微光边框与透明度；
@@ -203,7 +203,7 @@ node .\调试与探查工具\截取输入框特写截图.js
 
 ## 💡 攻坚历程与技术要点沉淀
 
-在将“晨雾森林毛玻璃主题”从 Antigravity 迁移并复刻至 ChatGPT / Codex 桌面端的过程中，我们针对现代 Chromium 架构与复杂 Tailwind 混淆样式进行了深度攻坚，沉淀了如下核心经验：
+在将“透明UI主题”从 Antigravity 迁移并复刻至 ChatGPT / Codex 桌面端的过程中，我们针对现代 Chromium 架构与复杂 Tailwind 混淆样式进行了深度攻坚，沉淀了如下核心经验：
 
 | 序号 | 攻坚现象 / 核心难点 | 根本技术成因 | 最终工程化解决方案 |
 | :---: | :--- | :--- | :--- |

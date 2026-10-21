@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const cssPath = path.resolve(__dirname, '../主题样式/晨雾森林毛玻璃主题.css');
+const cssPath = path.resolve(__dirname, '../主题样式/透明UI主题.css');
 
 /**
  * 获取主窗口 WebSocket 地址
