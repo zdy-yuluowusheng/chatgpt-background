@@ -48,7 +48,11 @@ async def evaluate_script(ws_url: str, expression: str) -> Any:
         while True:
             resp = json.loads(await ws.recv())
             if resp.get("id") == 1:
-                return resp.get("result", {}).get("result", {}).get("value")
+                result_obj = resp.get("result", {})
+                if "exceptionDetails" in result_obj:
+                    print(f"CDP JS Exception: {result_obj['exceptionDetails']}")
+                    return None
+                return result_obj.get("result", {}).get("value")
 
 async def capture_screen(ws_url: str, output_path: str) -> bool:
     """

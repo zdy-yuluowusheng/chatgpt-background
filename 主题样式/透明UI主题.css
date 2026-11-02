@@ -550,19 +550,63 @@ div[class*="_shell_"] div[class*="_content_"],
     background: transparent !important;
 }
 
-/* 设置界面内所有详情分组卡片（常规、权限、通知、快捷键、编辑器等所有子页面的详情卡片） */
-.group\/settings div.rounded-2xl:has([class*="settings-row"]),
-div[class*="group/settings"] div.rounded-2xl:has([class*="settings-row"]),
-section div.rounded-2xl:has([class*="settings-row"]),
-div.rounded-2xl.overflow-hidden.border.border-default,
-div.rounded-2xl:has(> [class*="@container/settings-row"]),
-div[class*="group-data-[density=compact]/settings"].rounded-2xl {
+/* 顶部吸顶条及渐变淡出遮罩彻底消除黑底（彻底解决使用情况和计费等页面上方黑横条） */
+div[class*="bg-surface"][class*="sticky"],
+div[class*="bg-surface"][class*="sticky"]::before,
+div[class*="bg-surface"][class*="sticky"]::after,
+[class*="after:from-surface"]::after,
+[class*="after:bg-linear"]::after,
+[class*="_MainContentTopFade_"],
+[class*="_MainContentTopFade_"]::before,
+[class*="_MainContentTopFade_"]::after {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+/* 设置界面内常规尺寸详情分组卡片透明雾化（排除超长卡片，防止 Chromium GPU 纹理溢出崩溃） */
+.group\/settings div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
+div[class*="group/settings"] div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
+section div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
+div.rounded-2xl.overflow-hidden.border.border-default:not(:has([class*="@container/keyboard-shortcuts"])),
+div.rounded-2xl:has(> [class*="@container/settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
+div[class*="group-data-[density=compact]/settings"].rounded-2xl:not(:has([class*="@container/keyboard-shortcuts"])) {
     background-color: rgba(255, 255, 255, 0.05) !important;
     backdrop-filter: blur(20px) saturate(160%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 16px !important;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 【核心修复】键盘快捷键超长卡片防御：禁用 backdrop-filter，避免 Chromium GPU 合成器超限丢弃文本 Pass，完美恢复字符 */
+div.rounded-2xl:has([class*="@container/keyboard-shortcuts"]),
+div.rounded-2xl:has([class*="keyboard-shortcuts"]),
+div[class*="@container/keyboard-shortcuts"],
+div[class*="@container/keyboard-shortcuts"] div.rounded-2xl {
+    background-color: rgba(18, 22, 28, 0.72) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* 键盘快捷键文本与说明对比度增强 */
+div[class*="@container/keyboard-shortcuts"] {
+    color: #f3f4f6 !important;
+}
+
+/* 键盘快捷键 <kbd> 胶囊与按键字符高保真清晰化 */
+kbd,
+[data-key],
+[class*="keyboard-shortcuts"] kbd {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.20) !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
 }
 
 /* 确保卡片内部各行保持纯透明，消除行内多余的子级背景 */
@@ -578,8 +622,8 @@ div:has(> [class*="@container/settings-row"]) > *:not(:last-child)::after {
     background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* 设置卡片内的次级下拉框与按钮透明化微光 */
-div[class*="settings-row"] button[class*="button-toolbar"],
+/* 设置卡片内的次级下拉框与按钮透明化微光（排除未悬停的方形占位按钮，消除幽灵方块） */
+div[class*="settings-row"] button[class*="button-toolbar"]:not([class*="aspect-square"]),
 div[class*="settings-row"] [class*="_ComposerFooterDropdown_"],
 div[class*="settings-row"] button[class*="rounded-button-toolbar"] {
     background-color: rgba(255, 255, 255, 0.08) !important;
@@ -589,9 +633,68 @@ div[class*="settings-row"] button[class*="rounded-button-toolbar"] {
     border-radius: 8px !important;
 }
 
-div[class*="settings-row"] button[class*="button-toolbar"]:hover {
+div[class*="settings-row"] button[class*="button-toolbar"]:not([class*="aspect-square"]):hover {
     background-color: rgba(255, 255, 255, 0.16) !important;
     border-color: rgba(255, 255, 255, 0.20) !important;
+}
+
+/* 消除快捷键未悬停行中出现的浅色方框（幽灵方块），悬停时再优雅展示 */
+div[class*="settings-row"] button[class*="aspect-square"]:not(:hover) {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+
+div[class*="settings-row"] button[class*="aspect-square"]:hover {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.20) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-radius: 8px !important;
+}
+
+/* 快捷键搜索框透明微光美化（消除实心暗紫色底） */
+div.bg-page-search,
+div[class*="bg-page-search"] {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-radius: 10px !important;
+}
+
+/* 使用情况和计费周期切换胶囊（7天/30天、5小时/每周）微光毛玻璃化（消除 92% 深黑底色） */
+div.inline-grid[class*="bg-surface-secondary/92"],
+div[class*="bg-surface-secondary/92"] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+div.inline-grid[class*="bg-surface-secondary/92"] span[class*="bg-surface"],
+div[class*="bg-surface-secondary/92"] span[class*="bg-surface"] {
+    background-color: rgba(255, 255, 255, 0.20) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    border-radius: 8px !important;
+}
+
+/* 使用情况分析表格表头半透明雾化美化（消除深色残留表头） */
+thead[class*="bg-surface-secondary/92"],
+thead[class*="bg-surface-secondary"],
+th[class*="bg-surface-secondary/92"],
+th[class*="bg-surface-secondary"] {
+    background-color: rgba(18, 22, 28, 0.65) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* 模型切换分段控制器透明微光 */
+div[class*="bg-(--segmented-control-background)"] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 /* 设置界面左侧菜单项选中与悬停微光胶囊 */
