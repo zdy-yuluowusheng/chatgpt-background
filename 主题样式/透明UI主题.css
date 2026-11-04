@@ -27,23 +27,32 @@ body {
 /* ================= 2. 主表面穿透与全景展开 ================= */
 main,
 main.bg-surface,
-main:is(.main-surface, [data-app-shell-main-surface], [class*="_MainContentSurface_"]),
+main:is(.main-surface, [data-app-shell-main-surface], [class*="MainContentSurface"], [class*="_MainContentSurface_"]),
 [role="main"],
 .thread-scroll-container,
 .main-surface,
+[class*="Workspace"],
 [class*="_Workspace_"],
+[class*="WorkspaceContent"],
 [class*="_WorkspaceContent_"],
+[class*="MainContentViewport"],
 [class*="_MainContentViewport_"],
+[class*="MainContentFrame"],
 [class*="_MainContentFrame_"],
+[class*="MainContentClip"],
 [class*="_MainContentClip_"],
+[class*="PageSurface"],
 [class*="_PageSurface_"] {
     background-color: transparent !important;
     background: transparent !important;
 }
 
-/* 消除主工作区顶部原生遮罩与渐变（精确定位遮罩层，杜绝误伤对话主容器） */
+/* 消除主工作区顶部原生遮罩与渐变（精确定位遮罩层，杜绝误伤对话主容器；兼容去下划线新版类名） */
+div[class*="MainContentTopFade"],
 div[class*="_MainContentTopFade_"],
-.app-shell-main-content-top-fade {
+.MainContentTopFade,
+.app-shell-main-content-top-fade,
+[class*="MainContentTopFade"] {
     display: none !important;
     opacity: 0 !important;
     pointer-events: none !important;
@@ -340,7 +349,11 @@ button:is([class*="scroll-to-bottom"], .group\/scroll-to-bottom):hover {
 div.flex.flex-col.items-end.gap-2,
 div[data-local-conversation-user-anchor] > div,
 [data-thread-find-target="conversation"],
-[data-thread-find-target="conversation"] > div {
+[data-thread-find-target="conversation"] > div,
+[data-markdown-text-style],
+[class*="MarkdownRoot"],
+[class*="assistant-message"],
+[class*="user-message"] {
     background: transparent !important;
     background-color: transparent !important;
     backdrop-filter: none !important;
@@ -349,22 +362,9 @@ div[data-local-conversation-user-anchor] > div,
     box-shadow: none !important;
 }
 
-/* 对话正文通用文字对比度与清晰度增强（白亮字体，优雅阅读） */
-.thread-scroll-container,
-[class*="realtime-voice-thread"],
-[data-local-conversation-user-anchor],
-[data-local-conversation-final-assistant],
-.text-user-message,
-[data-thread-find-target="conversation"] {
-    color: rgba(245, 247, 250, 0.95) !important;
-}
-
-/* 6.1 用户上传文件、附件卡片与资源胶囊（消除默认黑底，与主题背景与操作卡片统一纯透明） */
-[class*="composer-attachment-surface"],
-[class*="group/resource-card"],
-span[class*="composer-attachment-surface"],
-div[class*="composer-attachment-surface"],
-[class*="group/resource-card"][class*="bg-primary-soft"],
+/* 6.1 文件型产物外层卡片容器（Word、Excel 等生成文件）：保留外部单层大透明框，与脚本操作卡片保持统一的 14px 圆角与微光外框 */
+div:has(> [class*="group/resource-card"]),
+div[class*="bg-surface-elevated-secondary"]:has([class*="group/resource-card"]),
 [class*="extension:bg-background-primary-soft"] {
     background: transparent !important;
     background-color: transparent !important;
@@ -372,15 +372,52 @@ div[class*="composer-attachment-surface"],
     -webkit-backdrop-filter: none !important;
     border: 1px solid rgba(255, 255, 255, 0.16) !important;
     box-shadow: none !important;
-    border-radius: 16px !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
     transition: background-color 0.15s ease, border-color 0.15s ease !important;
 }
 
-/* 附件卡片鼠标悬停效果：通透微光提亮 */
-[class*="composer-attachment-surface"]:hover,
+/* 6.2 内部资源卡片行（彻底消除内层小框边框，避免与外部大框产生双重框重叠视觉缺陷） */
+[class*="group/resource-card"],
+div.group\/resource-card,
+[class*="group/resource-card"][class*="bg-primary-soft"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: inherit !important;
+}
+
+/* 6.3 资源卡片悬停效果：轻微微光反馈，严禁增加内部小边框 */
 [class*="group/resource-card"]:hover,
-[class*="composer-attachment-surface"]:has(button:hover),
 [class*="group/resource-card"]:has(button:hover) {
+    background: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-color: transparent !important;
+}
+
+/* 6.4 用户输入框（Composer）附件卡片独立样式：保留单层 14px 微光边框 */
+[class*="composer-attachment-surface"],
+span[class*="composer-attachment-surface"],
+div[class*="composer-attachment-surface"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    box-shadow: none !important;
+    border-radius: 14px !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+[class*="composer-attachment-surface"]:hover,
+[class*="composer-attachment-surface"]:has(button:hover) {
     background: rgba(255, 255, 255, 0.08) !important;
     background-color: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.28) !important;
@@ -407,21 +444,50 @@ div[class*="composer-attachment-surface"],
 }
 
 /* ================= 7. 命令行、脚本、代码块与操作卡片透明调整 ================= */
+/* 7.1 代码块外层容器（同时兼容新版 React 组件 data-code-block 架构与旧版 pre 标签架构） */
 pre,
 .markdown pre,
+[class*="markdown"] pre,
 [class*="_markdown"] pre,
-[class*="code-block"],
+[data-code-block],
+[data-code-block="true"],
+[data-markdown-copy="code-block"],
+[class*="CodeBlock"],
 [class*="_CodeBlock_"],
+[class*="CodeSurface"],
 [class*="_Surface_"],
-[class*="_StickyActionBar_"],
-[class*="_CodeContent_"],
-[class*="_BlockActions_"],
-div:has(> [class*="_CodeContent_"]),
-div:has(> pre),
+[class*="Surface-"],
 [data-testid*="code"],
 /* 终端命令行容器与操作卡片（如 Bash、已编辑文件、变更统计面板） */
 [class*="bg-surface-elevated"],
-.electron\:elevation-prominent,
+.electron\:elevation-prominent {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+}
+
+/* 7.2 彻底清除代码块内部所有子节点（标题动作栏、代码内容容器等）的黑色底色与渐变 */
+[data-code-block] > div,
+[data-code-block] [class*="ActionBar"],
+[data-code-block] [class*="StickyActionBar"],
+[data-code-block] [class*="Source-"],
+[data-code-block] [data-code-block-source],
+[class*="CodeBlock"] > div,
+[class*="CodeBlock"] [class*="ActionBar"],
+[class*="CodeBlock"] [class*="StickyActionBar"],
+[class*="CodeBlock"] [class*="Source-"],
+[class*="CodeBlock"] [data-code-block-source],
+[class*="_StickyActionBar_"],
+[class*="_BlockActions_"],
+div:has(> [class*="CodeContent"]),
+div:has(> [class*="_CodeContent_"]),
+div:has(> pre),
 [class*="bg-surface-elevated"] *,
 [class*="_StickyActionBar_"] *,
 [class*="_BlockActions_"] * {
@@ -433,27 +499,34 @@ div:has(> pre),
     box-shadow: none !important;
 }
 
-/* 为代码块、终端与文件卡片外围保留优雅轻质线框与圆角，保证边界清晰可辨 */
-pre,
-.markdown pre,
-[class*="_markdown"] pre,
-[class*="code-block"],
-[class*="_CodeBlock_"],
-[data-testid*="code"],
-[class*="bg-surface-elevated"],
-.electron\:elevation-prominent {
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    border-radius: 12px !important;
-}
-
-/* 终端/代码块内部标题栏（如 Bash 标题栏、已编辑文件标题栏）下边框细线微调 */
-[class*="bg-surface-elevated"] header,
+/* 7.3 代码块顶部标题动作栏（语言名称标识、运行与复制按钮）：底部细微半透明分割线 */
+[data-code-block] [class*="ActionBar"],
+[data-code-block] [class*="StickyActionBar"],
+[class*="CodeBlock"] [class*="ActionBar"],
+[class*="CodeBlock"] [class*="StickyActionBar"],
 [class*="_StickyActionBar_"],
+[class*="bg-surface-elevated"] header,
 pre header {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+/* 7.4 修复代码块内部 code 标签：确保代码行本身纯透明无边框，杜绝被行内代码规则误伤 */
+[data-code-block] code,
+[class*="CodeBlock"] code,
+[class*="_CodeBlock_"] code,
+[class*="CodeContent"],
+[class*="_CodeContent_"],
+pre code {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
 }
 
 /* 顶部切换摘要浮层面板（Summary Panel）与三个点更多菜单保持一致：仅根容器应用暗色雾化毛玻璃胶囊浮层，严格排除内部条目项 */
@@ -497,16 +570,25 @@ header:is([class*="bg-surface-elevated"], [class*="before:bg-surface-elevated"])
 }
 
 /* 工具栏按钮悬停柔和微光反馈 */
+[data-code-block] button:hover,
+[class*="CodeBlock"] button:hover,
+[class*="ActionBar"] button:hover,
+[class*="StickyActionBar"] button:hover,
 [class*="_StickyActionBar_"] button:hover,
 [class*="_BlockActions_"] button:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
     border-radius: 6px !important;
 }
 
-/* 行内代码徽章透明微光边框（排除代码块内部的代码行） */
-[class*="_markdown"] code:not([class*="_CodeContent_"], pre code),
-.markdown code:not([class*="_CodeContent_"], pre code),
-code:not([class*="_CodeContent_"], pre code, [class*="_CodeBlock_"] code) {
+/* 行内代码徽章透明微光边框（严格排除代码块内部的代码行） */
+code:not(
+    [class*="CodeContent"],
+    [class*="_CodeContent_"],
+    [data-code-block] code,
+    [class*="CodeBlock"] code,
+    [class*="_CodeBlock_"] code,
+    pre code
+) {
     background-color: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.10) !important;
     border-radius: 4px !important;
@@ -932,7 +1014,7 @@ div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-ghost-ho
     color: #ffffff !important;
 }
 
-/* ================= 12. 右侧边栏全景透明与子面板（文件预览、Markdown、查看审批、命令行）毛玻璃美化（排除内置浏览器） ================= */
+/* ================= 12. 右侧边栏全景透明与子面板（文件预览、Markdown、查看审批、命令行）毛玻璃美化（排除内置浏览器与文档预览正文） ================= */
 
 /* 12.1 右侧边栏根容器与分栏外壳全景穿透透明，根除黑底 */
 aside[data-app-shell-focus-area="right-panel"],
@@ -1027,7 +1109,65 @@ xterm,
   background: transparent !important;
 }
 
-/* 12.6 查看审批与操作栏（编辑、拒绝、接受）毛玻璃浮动胶囊化 */
+/* 12.6 【核心修复】文档与分页预览（Word / DOCX / PDF / 表格等）高清透亮保护，彻底根除雾化与模糊 */
+.popcorn-paged-annotation-preview,
+[class*="paged-annotation-preview"],
+[class*="popcorn-paged"],
+.popcorn-annotation-batch,
+[class*="annotation-batch"],
+[class*="document-preview"],
+[class*="file-preview"],
+[class*="office-preview"],
+.codex-docx-preview-wrapper,
+section.codex-docx-preview,
+.codex-docx-preview,
+article:has(section.codex-docx-preview),
+[data-testid="artifact-docx-comment-layer"],
+.popcorn-review-bar-overlay,
+.popcorn-review-bar-overlay-content,
+div[data-popcorn-review-bar],
+[data-tab-id*="docx"],
+[data-tab-id*="doc"],
+[data-tab-id*="xlsx"],
+[data-tab-id*="xls"],
+[data-tab-id*="pdf"] {
+  background-color: transparent !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* 保护 Word 文档自身的白底纸张，确保正文排版纯净清晰 */
+.codex-docx-preview-wrapper > section.codex-docx-preview {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.25) !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 确保分页预览容器内部所有层级（纸张、段落、文字、表格、批注、遮罩）100% 清晰锐利，严禁继承或覆盖任何模糊滤镜 */
+.popcorn-paged-annotation-preview *,
+[class*="paged-annotation-preview"] *,
+.popcorn-annotation-batch *,
+.codex-docx-preview-wrapper *,
+section.codex-docx-preview *,
+.codex-docx-preview *,
+.popcorn-review-bar-overlay *,
+.popcorn-review-bar-overlay-content * {
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 12.7 查看审批与浮动操作栏（编辑、拒绝、接受等胶囊条）毛玻璃美化（严格排除全屏遮罩与文档正文） */
 aside[data-app-shell-focus-area="right-panel"] div.flex.shrink-0.justify-end.border-t.border-default.bg-surface,
 aside[data-app-shell-focus-area="right-panel"] [class*="border-t"][class*="bg-surface"]:not(:has(webview), :has(iframe)) {
   background-color: transparent !important;
@@ -1043,18 +1183,17 @@ aside[data-app-shell-focus-area="right-panel"] div:has(> button[class*="button-t
   border-radius: 12px 12px 0 0 !important;
 }
 
-.popcorn-review-bar-overlay,
-.popcorn-review-bar-overlay-content,
-.popcorn-annotation-batch,
-.popcorn-paged-annotation-preview {
-  background-color: rgba(18, 22, 28, 0.55) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+/* 仅针对真正包含按钮的内部悬浮条卡片（如审批胶囊栏）应用暗色微光，坚决不作用于外层全屏 overlay */
+.popcorn-review-bar-overlay [class*="annotationAccent"] > div:has(button) {
+  background-color: rgba(18, 22, 28, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  border-radius: 9999px !important;
 }
 
-/* 12.7 顶部选项卡标签条 (Tab Strip) 微光通透美化 */
+/* 12.8 顶部选项卡标签条 (Tab Strip) 微光通透美化 */
 [data-app-shell-header-toolbar] button[role="tab"] {
   transition: all 0.15s ease-out !important;
 }
@@ -1072,7 +1211,7 @@ aside[data-app-shell-focus-area="right-panel"] div:has(> button[class*="button-t
   color: #f0f0f0 !important;
 }
 
-/* 12.8 文件树内搜索筛选输入框微光半透明美化 */
+/* 12.9 文件树内搜索筛选输入框微光半透明美化 */
 aside[data-app-shell-focus-area="right-panel"] input[placeholder*="筛选"],
 aside[data-app-shell-focus-area="right-panel"] input[placeholder*="Filter"],
 aside[data-app-shell-focus-area="right-panel"] div:has(> input[placeholder*="筛选"]) {
@@ -1081,7 +1220,7 @@ aside[data-app-shell-focus-area="right-panel"] div:has(> input[placeholder*="筛
   color: #ffffff !important;
 }
 
-/* 12.9 【核心保护】内置浏览器专用实体底色保护（排除内置浏览器，确保网页渲染与阅读清晰） */
+/* 12.10 【核心保护】内置浏览器专用实体底色保护（排除内置浏览器，确保网页渲染与阅读清晰） */
 webview,
 iframe,
 [data-codex-window-type="browser"],

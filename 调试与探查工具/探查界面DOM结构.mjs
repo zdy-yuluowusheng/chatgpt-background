@@ -12,14 +12,14 @@ const HOST = '127.0.0.1';
  * 待探测的核心 DOM 选择器清单（基于 Codex 与 ChatGPT 最新前端架构）
  */
 const SELECTOR_AUDIT_LIST = [
-  { key: '全局主表面', selector: 'main:is(.main-surface, [data-app-shell-main-surface], [class*="_MainContentSurface_"])' },
+  { key: '全局主表面', selector: 'main:is(.main-surface, [data-app-shell-main-surface], [class*="MainContentSurface"], [class*="_MainContentSurface_"])' },
   { key: '左侧导航栏', selector: 'aside.app-shell-left-panel' },
-  { key: '顶部状态栏', selector: 'header:is(.app-header-tint, [data-app-shell-header-edge-scroll], [class*="_Header_"])' },
-  { key: '主输入框壳', selector: ':is(.composer-surface-chrome, [class*="_ComposerLayoutRoot_"], [data-composer-surface-variant][data-composer-radius-variant])' },
-  { key: '输入框工具栏', selector: ':is(.composer-surface-chrome [class*="_footer_"], [class*="_ComposerLayoutRoot_"] [class*="_ComposerLayoutFooter_"])' },
+  { key: '顶部状态栏', selector: 'header:is(.app-header-tint, [data-app-shell-header-edge-scroll], [class*="Header"], [class*="_Header_"])' },
+  { key: '主输入框壳', selector: ':is(.composer-surface-chrome, [class*="ComposerLayoutRoot"], [class*="_ComposerLayoutRoot_"], [data-composer-surface-variant][data-composer-radius-variant])' },
+  { key: '输入框工具栏', selector: ':is(.composer-surface-chrome [class*="footer"], [class*="ComposerLayoutRoot"] [class*="ComposerLayoutFooter"], [class*="_ComposerLayoutFooter_"])' },
   { key: '对话滚动区', selector: '.thread-scroll-container' },
   { key: '消息边界项', selector: ':is([data-message-author-role], [data-local-conversation-user-anchor], [data-local-conversation-final-assistant])' },
-  { key: 'Markdown代码块', selector: '[class*="_markdown"] pre, .markdown pre, pre' },
+  { key: 'Markdown代码块', selector: '[data-code-block="true"], [data-code-block], [class*="CodeBlock"], [class*="_markdown"] pre, .markdown pre, pre' },
   { key: '毛玻璃主题Style节点', selector: '#__chatgpt_codex_custom_theme_style__' },
 ];
 
