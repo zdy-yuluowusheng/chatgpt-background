@@ -29,11 +29,17 @@ main,
 main.bg-surface,
 main:is(.main-surface, [data-app-shell-main-surface], [class*="MainContentSurface"], [class*="_MainContentSurface_"]),
 [role="main"],
+[data-app-shell-main-surface],
+[data-app-shell-frame],
+[data-app-shell-workspace],
+[data-app-shell-workspace]::before,
 .thread-scroll-container,
+[class*="thread-scroll-layout"],
 .main-surface,
 [class*="Workspace"],
 [class*="_Workspace_"],
 [class*="WorkspaceContent"],
+[class*="WorkspaceContent"]::before,
 [class*="_WorkspaceContent_"],
 [class*="MainContentViewport"],
 [class*="_MainContentViewport_"],
@@ -41,13 +47,72 @@ main:is(.main-surface, [data-app-shell-main-surface], [class*="MainContentSurfac
 [class*="_MainContentFrame_"],
 [class*="MainContentClip"],
 [class*="_MainContentClip_"],
+[class*="PageSurfaceLayout-"],
+[class*="FullHeightPageSurfaceLayout-"],
+[class*="FullHeightPageSurface-"],
 [class*="PageSurface"],
 [class*="_PageSurface_"] {
     background-color: transparent !important;
     background: transparent !important;
 }
 
-/* 消除主工作区顶部原生遮罩与渐变（精确定位遮罩层，杜绝误伤对话主容器；兼容去下划线新版类名） */
+/* 彻底清除主工作区外围意外的白框/圆角外框（仅保留微弱的侧栏分割线），消除窗口四周一圈边线 */
+main[class*="MainContentSurface-"],
+[class*="PageSurface-"],
+[class*="FullHeightPageSurface-"],
+[data-app-shell-main-surface] {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+[class*="MainContentLeftBorder-"] {
+    --app-shell-sidebar-divider: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 资料库、站点、代码审查、个人资料、首页工作区等页面内部铺满主区的 bg-surface 实体黑底透明穿透（排除内置浏览器与文档纸张） */
+[data-app-shell-focus-area="main"] div.bg-surface:not(
+    [class*="rounded-2xl"],
+    [class*="rounded-full"],
+    [class*="rounded-lg"],
+    [role="tooltip"],
+    [role="menu"],
+    [role="dialog"],
+    [data-radix-popper-content-wrapper] *,
+    [data-avatar-overlay-material],
+    [class*="codex-docx-preview"],
+    [class*="codex-docx-preview"] *,
+    :has(webview),
+    :has(iframe)
+) {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* 个人资料/结果页加载骨架渐变柔和化（消除偏紫黑条块感） */
+[class*="profileLoadingBlock-"] {
+    background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 34%, rgba(255, 255, 255, 0.10) 50%, rgba(255, 255, 255, 0) 66%) !important;
+}
+
+/* 消除主工作区顶部原生遮罩、渐隐层与平滑过渡黑条（兼容去下划线新版与旧版类名） */
+div[class*="MainContentTopFade"],
+div[class*="_MainContentTopFade_"],
+.MainContentTopFade,
+.app-shell-main-content-top-fade,
+[class*="MainContentTopFade"],
+[class*="MainContentTopFade"]::before,
+[class*="MainContentTopFade"]::after,
+[class*="floatingHeader-"],
+[class*="background-j0etS7"],
+[class*="FixedSmoothingOverlay-"],
+[class*="SmoothingOverlay-"],
+[data-app-shell-header-edge-scroll="true"]:not([data-app-shell-tab-row], [data-app-shell-workspace-layout="split"]) [class*="Toolbar-"] > :not([data-app-shell-thread-content-overlap]) {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    --smoothing-background-color: transparent !important;
+}
+
 div[class*="MainContentTopFade"],
 div[class*="_MainContentTopFade_"],
 .MainContentTopFade,
@@ -80,7 +145,9 @@ aside.app-shell-left-panel button,
 nav[class*="sidebar-rail"] button,
 button[data-sidebar-destination],
 button[data-slot="popover-trigger"],
-button[class*="_Button_"] {
+button[class*="_Button_"],
+aside.app-shell-left-panel button[class*="Button-"],
+[data-app-shell-sidebar-root] button[class*="Button-"] {
     background-color: transparent !important;
     background: transparent !important;
     box-shadow: none !important;
@@ -95,7 +162,11 @@ nav[class*="sidebar-rail"] button::after,
 button[data-sidebar-destination]::before,
 button[data-sidebar-destination]::after,
 button[class*="_Button_"]::before,
-button[class*="_Button_"]::after {
+button[class*="_Button_"]::after,
+aside.app-shell-left-panel button[class*="Button-"]::before,
+aside.app-shell-left-panel button[class*="Button-"]::after,
+[data-app-shell-sidebar-root] button[class*="Button-"]::before,
+[data-app-shell-sidebar-root] button[class*="Button-"]::after {
     background: transparent !important;
     background-color: transparent !important;
     box-shadow: none !important;
@@ -110,7 +181,9 @@ aside.app-shell-left-panel [role="button"]:hover,
 [data-app-shell-sidebar-root] button:hover,
 nav[class*="sidebar-rail"] button:hover,
 button[data-sidebar-destination]:hover,
-button[class*="_Button_"]:hover {
+button[class*="_Button_"]:hover,
+aside.app-shell-left-panel button[class*="Button-"]:hover,
+[data-app-shell-sidebar-root] button[class*="Button-"]:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
@@ -126,16 +199,20 @@ aside.app-shell-left-panel button:active,
 nav[class*="sidebar-rail"] button:active,
 button[data-sidebar-destination]:active,
 button[class*="_Button_"]:active,
+aside.app-shell-left-panel button[class*="Button-"]:active,
+[data-app-shell-sidebar-root] button[class*="Button-"]:active,
 aside.app-shell-left-panel button[data-selected],
 [data-app-shell-sidebar-root] button[data-selected],
 nav[class*="sidebar-rail"] button[data-selected],
 button[data-sidebar-destination][data-selected],
 button[class*="_Button_"][data-selected],
+aside.app-shell-left-panel button[class*="Button-"][data-selected],
 aside.app-shell-left-panel button[data-state="open"],
 [data-app-shell-sidebar-root] button[data-state="open"],
 nav[class*="sidebar-rail"] button[data-state="open"],
 button[data-sidebar-destination][data-state="open"],
 button[class*="_Button_"][data-state="open"],
+aside.app-shell-left-panel button[class*="Button-"][data-state="open"],
 aside.app-shell-left-panel button[aria-current="page"],
 button[data-sidebar-destination][aria-current="page"] {
     background-color: rgba(255, 255, 255, 0.18) !important;
@@ -148,13 +225,19 @@ button[data-sidebar-destination][aria-current="page"] {
 }
 
 /* ================= 4. 顶部导航与会话名称纯透明穿透 ================= */
-header:is(.app-header-tint, [data-app-shell-header-edge-scroll], [class*="_Header_"]),
+header:is(.app-header-tint, [data-app-shell-header-edge-scroll], [class*="_Header_"], [class*="Header-"], [class*="ApplicationMenuPageHeader-"], [class*="FloatingHeader-"]),
 header,
 header *,
 [data-app-shell-titlebar],
 [data-app-shell-titlebar] *,
+[data-app-shell-titlebar]::after,
+[data-app-shell-main-titlebar],
+[data-app-shell-main-titlebar]::after,
 div[class*="_ApplicationMenuTopBar_"],
-div[class*="_ApplicationMenuTopBar_"] * {
+div[class*="_ApplicationMenuTopBar_"] *,
+div[class*="ApplicationMenuTopBar-"],
+div[class*="ApplicationMenuTopBar-"] *,
+[class*="ApplicationMenuPageHeader-"]::after {
     background-color: transparent !important;
     background: transparent !important;
     backdrop-filter: none !important;
@@ -165,7 +248,7 @@ div[class*="_ApplicationMenuTopBar_"] * {
 }
 
 /* ================= 5. 主输入框 (Composer) 雾化透明毛玻璃微光胶囊 ================= */
-:is(.composer-surface-chrome, [class*="_ComposerLayoutRoot_"], [data-composer-surface-variant][data-composer-radius-variant]) {
+:is(.composer-surface-chrome, [class*="_ComposerLayoutRoot_"], [class*="ComposerLayoutRoot-"], [data-composer-surface-variant][data-composer-radius-variant]) {
     background-color: rgba(14, 22, 19, 0.24) !important;
     background: rgba(14, 22, 19, 0.24) !important;
     backdrop-filter: blur(12px) saturate(125%) brightness(108%) !important;
@@ -177,38 +260,87 @@ div[class*="_ApplicationMenuTopBar_"] * {
 }
 
 /* 输入框聚焦时提升微光边缘与通透饱和度 */
-:is(.composer-surface-chrome, [class*="_ComposerLayoutRoot_"], [data-composer-surface-variant][data-composer-radius-variant]):focus-within {
+:is(.composer-surface-chrome, [class*="_ComposerLayoutRoot_"], [class*="ComposerLayoutRoot-"], [data-composer-surface-variant][data-composer-radius-variant]):focus-within {
     background-color: rgba(18, 28, 24, 0.32) !important;
     background: rgba(18, 28, 24, 0.32) !important;
     border-color: rgba(255, 255, 255, 0.28) !important;
     box-shadow: 0 8px 36px 0 rgba(0, 0, 0, 0.30), 0 0 0 1px rgba(255, 255, 255, 0.18) !important;
 }
 
-/* 输入框内部主体容器透明化 (消除初始主页 Home 默认实体黑底，与会话内毛玻璃雾化统一) */
-:is([class*="_ComposerLayoutBody_"], [data-composer-body]) {
+/* 输入框内部主体容器与尾部思考强度条透明化 (消除主页 Home 实体黑底及图像页 trailing surface 灰黑块) */
+:is([class*="_ComposerLayoutBody_"], [class*="ComposerLayoutBody-"], [data-composer-body]) {
     background-color: transparent !important;
     background: transparent !important;
     box-shadow: none !important;
 }
 
+[class*="bg-(--composer-layout-surface-background)"]:not([data-composer-surface-variant]) {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+[class*="composerContext-"],
+[class*="ComposerLayoutReplyContext-"] {
+    background: rgba(255, 255, 255, 0.06) !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
 /* 输入框底部工具栏与操作按钮条保持透明 */
-:is(.composer-surface-chrome [class*="_footer_"], [class*="_ComposerLayoutRoot_"] [class*="_ComposerLayoutFooter_"]) {
+:is(.composer-surface-chrome [class*="_footer_"], [class*="_ComposerLayoutRoot_"] [class*="_ComposerLayoutFooter_"], [class*="ComposerLayoutRoot-"] [class*="ComposerLayoutFooter-"]) {
     background-color: transparent !important;
     background: transparent !important;
     border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
-/* 消除输入框底部外围宿主遮罩与底层暗色实体背景，实现会话页面底部全景通透雾化 (彻底消除黑底) */
+/* 输入框 '+' 展开顶部浮层菜单 (ComposerTopMenuPanel / expanded-top-tray) 磨砂玻璃化并防穿透重叠 */
+[class*="ComposerTopMenuPanel-"][data-composer-expanded-top-tray],
+[data-composer-expanded-top-tray] {
+    background: rgba(18, 24, 30, 0.80) !important;
+    background-color: rgba(18, 24, 30, 0.80) !important;
+    backdrop-filter: blur(24px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.40) !important;
+    position: relative !important;
+    z-index: 35 !important;
+}
+
+/* 【核心修复】消除输入框底部宿主容器、渐变遮罩及 ::before / ::after 伪元素实黑边缘 (根除新版 footer-A8ZvKV 黑条黑角) */
 [data-thread-scroll-footer],
-div:is([class*="bg-gradient-to-t"], [class*="from-surface"]),
-div[class*="from-surface-secondary"],
-div[class*="pointer-events-none"][class*="inset-x-0"]:is([class*="bg-surface"], [class*="-top-8"], [class*="bottom-0"]),
+[data-thread-footer-background],
+[data-thread-footer-background] > div,
+[data-thread-footer-background] [class*="surface-"],
+[data-thread-footer-background] [class*="fade-"],
+[class*="EnterpriseFooterBackground-"],
+[class*="thread-scroll-layout"] [class*="footer-"],
+[class*="thread-scroll-layout"] [class*="footer-"]::before,
+[class*="thread-scroll-layout"] [class*="footer-"]::after,
+div[class*="footer-"][class*="shiftWithTranscript-"],
+div[class*="footer-"][class*="shiftWithTranscript-"]::before,
+div[class*="footer-"][class*="shiftWithTranscript-"]::after,
+div[class*="footer-"]:has([data-thread-composer-backdrop]),
+div[class*="footer-"]:has([data-thread-composer-backdrop])::before,
+div[class*="footer-"]:has([data-thread-composer-backdrop])::after,
+div[class*="pointer-events-none"][class*="inset-x-0"]:is([class*="bg-surface"], [class*="-top-8"], [class*="bottom-0"], [class*="footer-"]),
+div[class*="pointer-events-none"][class*="inset-x-0"]::before,
+div[class*="pointer-events-none"][class*="inset-x-0"]::after,
 [class*="thread-scroll-layout"] div:has(> [data-codex-composer-root]),
 [class*="thread-scroll-layout"] div[class*="pointer-events-none"][class*="bottom-0"],
-[class*="thread-scroll-layout"] div[class*="pointer-events-none"][class*="bg-surface"] {
+[class*="thread-scroll-layout"] div[class*="pointer-events-none"][class*="bottom-0"]::before,
+[class*="thread-scroll-layout"] div[class*="pointer-events-none"][class*="bottom-0"]::after,
+div:is([class*="bg-gradient-to-t"], [class*="bg-linear-to-t"], [class*="bg-linear-to-b"], [class*="from-surface"], [class*="via-surface"], [class*="to-surface"]):not(button, [class*="preview"], :has(webview), :has(iframe)),
+div[class*="from-surface-secondary"]:not(button, [class*="preview"]),
+div[class*="before:from-surface"]::before,
+div[class*="after:from-surface"]::after,
+div[class*="before:bg-surface"]::before,
+div[class*="after:bg-surface"]::after {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
+    box-shadow: none !important;
 }
 
 /* 初始主界面输入框上方操作条（选择项目、本地模式、分支等）：只保留外层高雅圆角长方形毛玻璃微光胶囊 (消除双层内外框重叠) */
@@ -233,9 +365,9 @@ div[data-composer-rail-placement="above"]::after {
     display: none !important;
 }
 
-/* 内部所有项目层与包装容器：彻底消除内层边框、背景、圆角与阴影，实现干净纯粹的单层视觉效果 */
-div[data-composer-rail] :is([data-composer-rail-item], div[class*="_item_"], div[class*="bg-background-composer-action-bar"]),
-:is([data-composer-rail-item], div[class*="_item_"], div[class*="bg-background-composer-action-bar"]) {
+/* 内部所有项目层与包装容器：彻底消除内层边框、背景、圆角与阴影，实现干净纯粹的单层视觉效果（兼容新版 item- 与旧版 _item_） */
+div[data-composer-rail] :is([data-composer-rail-item], div[class*="_item_"], div[class*="item-"], div[class*="bg-background-composer-action-bar"]),
+:is([data-composer-rail-item], div[class*="_item_"], [class*="attached-"] > div[class*="item-"], div[class*="bg-background-composer-action-bar"]) {
     background: transparent !important;
     background-color: transparent !important;
     border: none !important;
@@ -250,13 +382,15 @@ div[data-composer-rail] :is([data-composer-rail-item], div[class*="_item_"], div
 /* 分支操作栏内部按钮悬停微光反馈 */
 div[data-composer-rail] button:hover,
 [data-composer-rail-item] button:hover,
-:is([data-composer-rail-item], div[class*="_item_"]) button:hover {
+:is([data-composer-rail-item], div[class*="_item_"], [class*="attached-"] > div[class*="item-"]) button:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 /* 额度限制/速率限制通知卡片（Codex 和工作使用额度已用完提示条、速率限制重置机会等所有通知卡片）高级毛玻璃雾化微光胶囊 (消除黑底) */
 aside[role="status"],
 aside[class*="_banner_"],
+aside[class*="banner-"],
+div[class*="banner-"]:not(.app-shell-left-panel),
 aside.rounded-3xl:not(.app-shell-left-panel),
 [data-codex-composer-root] aside:not(.app-shell-left-panel),
 div[class*="has-[[data-home-beacon-banner]]"] aside {
@@ -271,6 +405,7 @@ div[class*="has-[[data-home-beacon-banner]]"] aside {
 
 aside[role="status"] button,
 aside[class*="_banner_"] button,
+aside[class*="banner-"] button,
 aside.rounded-3xl:not(.app-shell-left-panel) button {
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
@@ -279,7 +414,8 @@ aside.rounded-3xl:not(.app-shell-left-panel) button {
 /* 通知卡片内“查看重置次数”等主要操作按钮高亮白微光胶囊 */
 aside.rounded-3xl:not(.app-shell-left-panel) button[class*="bg-primary-solid"],
 aside[role="status"] button[class*="bg-primary-solid"],
-aside[class*="_banner_"] button[class*="bg-primary-solid"] {
+aside[class*="_banner_"] button[class*="bg-primary-solid"],
+aside[class*="banner-"] button[class*="bg-primary-solid"] {
     background-color: rgba(255, 255, 255, 0.90) !important;
     color: #120e16 !important;
     border: 1px solid rgba(255, 255, 255, 0.40) !important;
@@ -289,7 +425,8 @@ aside[class*="_banner_"] button[class*="bg-primary-solid"] {
 
 aside.rounded-3xl:not(.app-shell-left-panel) button[class*="bg-primary-solid"]:hover,
 aside[role="status"] button[class*="bg-primary-solid"]:hover,
-aside[class*="_banner_"] button[class*="bg-primary-solid"]:hover {
+aside[class*="_banner_"] button[class*="bg-primary-solid"]:hover,
+aside[class*="banner-"] button[class*="bg-primary-solid"]:hover {
     background-color: #ffffff !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
 }
@@ -297,6 +434,7 @@ aside[class*="_banner_"] button[class*="bg-primary-solid"]:hover {
 /* 额度卡片内“重置使用量”等常规操作按钮微光通透胶囊 */
 aside[role="status"] button:not([class*="blue"], [class*="bg-primary-solid"]),
 aside[class*="_banner_"] button:not([class*="blue"], [class*="bg-primary-solid"]),
+aside[class*="banner-"] button:not([class*="blue"], [class*="bg-primary-solid"]),
 aside.rounded-3xl:not(.app-shell-left-panel) button:not([class*="blue"], [class*="bg-primary-solid"]) {
     background-color: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -305,6 +443,7 @@ aside.rounded-3xl:not(.app-shell-left-panel) button:not([class*="blue"], [class*
 
 aside[role="status"] button:not([class*="blue"], [class*="bg-primary-solid"]):hover,
 aside[class*="_banner_"] button:not([class*="blue"], [class*="bg-primary-solid"]):hover,
+aside[class*="banner-"] button:not([class*="blue"], [class*="bg-primary-solid"]):hover,
 aside.rounded-3xl:not(.app-shell-left-panel) button:not([class*="blue"], [class*="bg-primary-solid"]):hover {
     background-color: rgba(255, 255, 255, 0.16) !important;
     border-color: rgba(255, 255, 255, 0.28) !important;
@@ -312,7 +451,8 @@ aside.rounded-3xl:not(.app-shell-left-panel) button:not([class*="blue"], [class*
 
 /* 额度卡片内“升级”高亮按钮微亮蓝光通透胶囊 */
 aside[role="status"] button[class*="blue"],
-aside[class*="_banner_"] button[class*="blue"] {
+aside[class*="_banner_"] button[class*="blue"],
+aside[class*="banner-"] button[class*="blue"] {
     background-color: rgba(30, 100, 220, 0.35) !important;
     border: 1px solid rgba(120, 180, 255, 0.35) !important;
     box-shadow: 0 2px 12px rgba(0, 100, 255, 0.25) !important;
@@ -320,19 +460,28 @@ aside[class*="_banner_"] button[class*="blue"] {
 }
 
 aside[role="status"] button[class*="blue"]:hover,
-aside[class*="_banner_"] button[class*="blue"]:hover {
+aside[class*="_banner_"] button[class*="blue"]:hover,
+aside[class*="banner-"] button[class*="blue"]:hover {
     background-color: rgba(30, 120, 255, 0.50) !important;
     border-color: rgba(150, 200, 255, 0.50) !important;
 }
 
-/* 会话悬浮滚动到底部按钮毛玻璃胶囊 */
+/* 会话悬浮滚动到底部按钮毛玻璃胶囊（并透明穿透其内部 span.bg-surface，消除实黑内圈） */
 button:is([class*="scroll-to-bottom"], .group\/scroll-to-bottom) {
-    background-color: rgba(18, 24, 30, 0.65) !important;
+    background-color: rgba(18, 24, 30, 0.58) !important;
     backdrop-filter: blur(16px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     color: #ffffff !important;
+}
+
+button:is([class*="scroll-to-bottom"], .group\/scroll-to-bottom) > span,
+button:is([class*="scroll-to-bottom"], .group\/scroll-to-bottom) [class*="bg-surface"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 button:is([class*="scroll-to-bottom"], .group\/scroll-to-bottom):hover {
@@ -362,10 +511,10 @@ div[data-local-conversation-user-anchor] > div,
     box-shadow: none !important;
 }
 
-/* 6.1 文件型产物外层卡片容器（Word、Excel 等生成文件）：保留外部单层大透明框，与脚本操作卡片保持统一的 14px 圆角与微光外框 */
+/* 6.1 文件型产物外层卡片容器（Word、Excel 等生成文件）：保留外部单层大透明框，与脚本操作卡片保持统一的 14px 圆角与微光外框（严禁匹配“已编辑 N 个文件”内部按钮行） */
 div:has(> [class*="group/resource-card"]),
 div[class*="bg-surface-elevated-secondary"]:has([class*="group/resource-card"]),
-[class*="extension:bg-background-primary-soft"] {
+div[class*="extension:bg-background-primary-soft/50"]:has([class*="group/resource-card"]) {
     background: transparent !important;
     background-color: transparent !important;
     backdrop-filter: none !important;
@@ -444,7 +593,7 @@ div[class*="composer-attachment-surface"] {
 }
 
 /* ================= 7. 命令行、脚本、代码块与操作卡片透明调整 ================= */
-/* 7.1 代码块外层容器（同时兼容新版 React 组件 data-code-block 架构与旧版 pre 标签架构） */
+/* 7.1 代码块外层容器（同时兼容新版 React 组件 data-code-block / CodeBlock- 架构与旧版 pre 标签架构；精准排除 PageSurface / MainContentSurface） */
 pre,
 .markdown pre,
 [class*="markdown"] pre,
@@ -452,14 +601,16 @@ pre,
 [data-code-block],
 [data-code-block="true"],
 [data-markdown-copy="code-block"],
-[class*="CodeBlock"],
+[class*="CodeBlock-"],
 [class*="_CodeBlock_"],
-[class*="CodeSurface"],
+[class*="CodeBlockPlaceholder-"],
+[class*="SmoothedCodeBlock-"],
+[class*="CodeSurface-"],
 [class*="_Surface_"],
-[class*="Surface-"],
+[data-code-block] [class*="Surface-"],
 [data-testid*="code"],
-/* 终端命令行容器与操作卡片（如 Bash、已编辑文件、变更统计面板） */
-[class*="bg-surface-elevated"],
+/* 终端命令行容器与操作卡片（如 Bash、已编辑文件、变更统计面板；排除浮层弹窗与输入框/文本域） */
+div[class*="bg-surface-elevated"]:not([role="dialog"], [role="menu"], [role="tooltip"], [class*="Popover-"], [class*="MenuList-"], [class*="Modal-"], :has(webview), :has(iframe)),
 .electron\:elevation-prominent {
     background: transparent !important;
     background-color: transparent !important;
@@ -478,18 +629,22 @@ pre,
 [data-code-block] [class*="StickyActionBar"],
 [data-code-block] [class*="Source-"],
 [data-code-block] [data-code-block-source],
-[class*="CodeBlock"] > div,
-[class*="CodeBlock"] [class*="ActionBar"],
-[class*="CodeBlock"] [class*="StickyActionBar"],
-[class*="CodeBlock"] [class*="Source-"],
-[class*="CodeBlock"] [data-code-block-source],
+[class*="CodeBlock-"] > div,
+[class*="CodeBlock-"] [class*="ActionBar"],
+[class*="CodeBlock-"] [class*="StickyActionBar"],
+[class*="CodeBlock-"] [class*="Source-"],
+[class*="CodeBlock-"] [data-code-block-source],
+[class*="StickyActionBar-"],
 [class*="_StickyActionBar_"],
+[class*="BlockActions-"],
 [class*="_BlockActions_"],
-div:has(> [class*="CodeContent"]),
+div:has(> [class*="CodeContent-"]),
 div:has(> [class*="_CodeContent_"]),
 div:has(> pre),
-[class*="bg-surface-elevated"] *,
+div[class*="bg-surface-elevated"]:not([role="dialog"], [role="menu"], [role="tooltip"], [class*="Popover-"], [class*="MenuList-"], [class*="Modal-"]) *,
+[class*="StickyActionBar-"] *,
 [class*="_StickyActionBar_"] *,
+[class*="BlockActions-"] *,
 [class*="_BlockActions_"] * {
     background: transparent !important;
     background-color: transparent !important;
@@ -502,8 +657,9 @@ div:has(> pre),
 /* 7.3 代码块顶部标题动作栏（语言名称标识、运行与复制按钮）：底部细微半透明分割线 */
 [data-code-block] [class*="ActionBar"],
 [data-code-block] [class*="StickyActionBar"],
-[class*="CodeBlock"] [class*="ActionBar"],
-[class*="CodeBlock"] [class*="StickyActionBar"],
+[class*="CodeBlock-"] [class*="ActionBar"],
+[class*="CodeBlock-"] [class*="StickyActionBar"],
+[class*="StickyActionBar-"],
 [class*="_StickyActionBar_"],
 [class*="bg-surface-elevated"] header,
 pre header {
@@ -513,11 +669,20 @@ pre header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
 }
 
+/* Markdown 表格吸顶表头通透雾化，消除硬黑条 */
+[class*="TableStickyHeader-"] [class*="TableHeaderCell-"],
+[class*="Table-"][data-d-sticky-header] th {
+    background: rgba(18, 24, 30, 0.45) !important;
+    background-color: rgba(18, 24, 30, 0.45) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
 /* 7.4 修复代码块内部 code 标签：确保代码行本身纯透明无边框，杜绝被行内代码规则误伤 */
 [data-code-block] code,
-[class*="CodeBlock"] code,
+[class*="CodeBlock-"] code,
 [class*="_CodeBlock_"] code,
-[class*="CodeContent"],
+[class*="CodeContent-"],
 [class*="_CodeContent_"],
 pre code {
     background: transparent !important;
@@ -571,10 +736,11 @@ header:is([class*="bg-surface-elevated"], [class*="before:bg-surface-elevated"])
 
 /* 工具栏按钮悬停柔和微光反馈 */
 [data-code-block] button:hover,
-[class*="CodeBlock"] button:hover,
+[class*="CodeBlock-"] button:hover,
 [class*="ActionBar"] button:hover,
 [class*="StickyActionBar"] button:hover,
 [class*="_StickyActionBar_"] button:hover,
+[class*="BlockActions-"] button:hover,
 [class*="_BlockActions_"] button:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
     border-radius: 6px !important;
@@ -582,14 +748,16 @@ header:is([class*="bg-surface-elevated"], [class*="before:bg-surface-elevated"])
 
 /* 行内代码徽章透明微光边框（严格排除代码块内部的代码行） */
 code:not(
-    [class*="CodeContent"],
+    [class*="CodeContent-"],
     [class*="_CodeContent_"],
     [data-code-block] code,
-    [class*="CodeBlock"] code,
+    [class*="CodeBlock-"] code,
     [class*="_CodeBlock_"] code,
     pre code
-) {
+),
+[class*="InlineCode-"] {
     background-color: rgba(255, 255, 255, 0.08) !important;
+    background-image: none !important;
     border: 1px solid rgba(255, 255, 255, 0.10) !important;
     border-radius: 4px !important;
     padding: 2px 6px !important;
@@ -601,8 +769,14 @@ code:not(
 [role="dialog"],
 [data-radix-popper-content-wrapper] > div,
 div[class*="_Popover_"],
-div[data-radix-menu-content] {
-    background-color: rgba(18, 24, 30, 0.52) !important;
+div[class*="Popover-"],
+div[class*="MenuList-"],
+div[class*="Modal-"],
+div[data-radix-menu-content],
+.unified-search-dialog [cmdk-root],
+.command-menu-dialog [cmdk-root],
+.command-menu-dialog [data-cmdk-root] {
+    background-color: rgba(18, 24, 30, 0.56) !important;
     backdrop-filter: blur(28px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -622,22 +796,27 @@ div[data-radix-menu-content] {
 }
 
 /* ================= 9. 设置界面全景透明与所有菜单详情卡片透明雾化 ================= */
-/* 设置右侧整体容器穿透透明，消除默认实体黑底 */
+/* 设置右侧整体容器穿透透明，消除默认实体黑底（兼容新版 shell- 与旧版 _shell_） */
 div.electron\:bg-surface,
 div[class*="electron:bg-surface"],
 div[class*="_shell_"],
 div[class*="_shell_"] div[class*="_content_"],
-[data-app-shell-focus-area="main"] > div {
+div[class*="shell-"] div[class*="content-"],
+[data-app-shell-focus-area="main"] > div:not(:has(webview), :has(iframe)) {
     background-color: transparent !important;
     background: transparent !important;
 }
 
-/* 顶部吸顶条及渐变淡出遮罩彻底消除黑底（彻底解决使用情况和计费等页面上方黑横条） */
+/* 顶部吸顶条及渐变淡出遮罩彻底消除黑底（彻底解决使用情况和计费、资料库、插件、站点等页面上方黑横条） */
 div[class*="bg-surface"][class*="sticky"],
 div[class*="bg-surface"][class*="sticky"]::before,
 div[class*="bg-surface"][class*="sticky"]::after,
+[class*="shell-"][data-sticky]::before,
+[class*="shell-"][data-sticky]::after,
 [class*="after:from-surface"]::after,
+[class*="before:from-surface"]::before,
 [class*="after:bg-linear"]::after,
+[class*="before:bg-linear"]::before,
 [class*="_MainContentTopFade_"],
 [class*="_MainContentTopFade_"]::before,
 [class*="_MainContentTopFade_"]::after {
@@ -646,13 +825,15 @@ div[class*="bg-surface"][class*="sticky"]::after,
     background-image: none !important;
 }
 
-/* 设置界面内常规尺寸详情分组卡片透明雾化（排除超长卡片，防止 Chromium GPU 纹理溢出崩溃） */
-.group\/settings div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
-div[class*="group/settings"] div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
-section div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
-div.rounded-2xl.overflow-hidden.border.border-default:not(:has([class*="@container/keyboard-shortcuts"])),
-div.rounded-2xl:has(> [class*="@container/settings-row"]):not(:has([class*="@container/keyboard-shortcuts"])),
-div[class*="group-data-[density=compact]/settings"].rounded-2xl:not(:has([class*="@container/keyboard-shortcuts"])) {
+/* 设置界面内常规尺寸详情分组卡片及智能伙伴卡片透明雾化（排除超长卡片 >27 行，防止 Chromium GPU 纹理溢出崩溃） */
+.group\/settings div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"]), :has([class*="keyboard-shortcuts"]), :has(> :nth-child(28))),
+div[class*="group/settings"] div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"]), :has([class*="keyboard-shortcuts"]), :has(> :nth-child(28))),
+section div.rounded-2xl:has([class*="settings-row"]):not(:has([class*="@container/keyboard-shortcuts"]), :has([class*="keyboard-shortcuts"]), :has(> :nth-child(28))),
+div.rounded-2xl.overflow-hidden.border.border-default:not(:has([class*="@container/keyboard-shortcuts"]), :has([class*="keyboard-shortcuts"]), :has(> :nth-child(28))),
+div.rounded-2xl:has(> [class*="@container/settings-row"]):not(:has([class*="@container/keyboard-shortcuts"]), :has([class*="keyboard-shortcuts"]), :has(> :nth-child(28))),
+div[class*="group-data-[density=compact]/settings"].rounded-2xl:not(:has([class*="@container/keyboard-shortcuts"]), :has([class*="keyboard-shortcuts"]), :has(> :nth-child(28))),
+.group\/settings div.rounded-2xl.border.bg-surface:not([class*="codex-docx"], :has(webview), :has(iframe)),
+[data-app-shell-focus-area="main"] div.rounded-2xl.border.bg-surface:not([class*="codex-docx"], :has(webview), :has(iframe)) {
     background-color: rgba(255, 255, 255, 0.05) !important;
     backdrop-filter: blur(20px) saturate(160%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
@@ -661,9 +842,13 @@ div[class*="group-data-[density=compact]/settings"].rounded-2xl:not(:has([class*
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
 
-/* 【核心修复】键盘快捷键超长卡片防御：禁用 backdrop-filter，避免 Chromium GPU 合成器超限丢弃文本 Pass，完美恢复字符 */
+/* 【核心修复】键盘快捷键超长卡片及多行长列表卡片防御：禁用 backdrop-filter，避免 Chromium GPU 合成器超限丢弃文本 Pass */
+.group\/settings div.rounded-2xl:has([class*="@container/keyboard-shortcuts"]),
+.group\/settings div.rounded-2xl:has([class*="keyboard-shortcuts"]),
+.group\/settings div.rounded-2xl:has(> :nth-child(28)),
 div.rounded-2xl:has([class*="@container/keyboard-shortcuts"]),
 div.rounded-2xl:has([class*="keyboard-shortcuts"]),
+div.rounded-2xl:has(> :nth-child(28)),
 div[class*="@container/keyboard-shortcuts"],
 div[class*="@container/keyboard-shortcuts"] div.rounded-2xl {
     background-color: rgba(18, 22, 28, 0.72) !important;
@@ -675,14 +860,16 @@ div[class*="@container/keyboard-shortcuts"] div.rounded-2xl {
 }
 
 /* 键盘快捷键文本与说明对比度增强 */
-div[class*="@container/keyboard-shortcuts"] {
+div[class*="@container/keyboard-shortcuts"],
+.group\/settings:has(input[placeholder*="快捷键"]) {
     color: #f3f4f6 !important;
 }
 
 /* 键盘快捷键 <kbd> 胶囊与按键字符高保真清晰化 */
 kbd,
 [data-key],
-[class*="keyboard-shortcuts"] kbd {
+[class*="keyboard-shortcuts"] kbd,
+[class*="Shortcut-"] {
     background-color: rgba(255, 255, 255, 0.15) !important;
     border: 1px solid rgba(255, 255, 255, 0.25) !important;
     color: #ffffff !important;
@@ -704,15 +891,32 @@ div:has(> [class*="@container/settings-row"]) > *:not(:last-child)::after {
     background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* 设置卡片内的次级下拉框与按钮透明化微光（排除未悬停的方形占位按钮，消除幽灵方块） */
+/* 设置卡片内的次级下拉框、按钮与输入框/文本域透明化微光（排除未悬停方形占位按钮及颜色预览点） */
 div[class*="settings-row"] button[class*="button-toolbar"]:not([class*="aspect-square"]),
 div[class*="settings-row"] [class*="_ComposerFooterDropdown_"],
-div[class*="settings-row"] button[class*="rounded-button-toolbar"] {
+div[class*="settings-row"] [class*="ComposerFooterDropdown-"],
+div[class*="settings-row"] button[class*="rounded-button-toolbar"],
+.group\/settings button[role="combobox"] {
     background-color: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border-radius: 8px !important;
+}
+
+.group\/settings input:not([type="checkbox"], [type="radio"], .bg-transparent, [class*="bg-transparent"]),
+.group\/settings textarea {
+    background-color: rgba(18, 22, 28, 0.46) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* 设置页二级胶囊按钮 (Codex 云端/Worktrees 选中 tab) 去黑化，柔和玻璃高亮 */
+.group\/settings button[class*="bg-surface-secondary"] {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.20) !important;
+    color: #ffffff !important;
 }
 
 div[class*="settings-row"] button[class*="button-toolbar"]:not([class*="aspect-square"]):hover {
@@ -827,7 +1031,8 @@ div[role="tooltip"],
 [data-radix-popper-content-wrapper] [role="tooltip"],
 div[class*="bg-(--color-background-tooltip)"],
 div[class*="border-(color:--color-border-tooltip)"],
-div[class*="_textTheme_"][role="tooltip"] {
+div[class*="_textTheme_"][role="tooltip"],
+div[class*="Tooltip-"]:not([class*="TooltipMarker-"])[role="tooltip"] {
     background-color: rgba(18, 24, 30, 0.65) !important;
     background: rgba(18, 24, 30, 0.65) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
@@ -846,7 +1051,8 @@ div[class*="_textTheme_"][role="tooltip"] {
 
 [role="tooltip"] kbd,
 [role="tooltip"] [class*="kbd"],
-[role="tooltip"] [class*="shortcut"] {
+[role="tooltip"] [class*="shortcut"],
+[role="tooltip"] [class*="Shortcut-"] {
     background-color: rgba(255, 255, 255, 0.14) !important;
     border: 1px solid rgba(255, 255, 255, 0.20) !important;
     border-radius: 6px !important;
@@ -917,23 +1123,35 @@ button[class*="rounded-button-toolbar"]:hover {
     border-radius: 10px !important;
 }
 
-/* ================= 11. 资料库与插件 (Customize) 页面全局透明穿透与头部横条黑底消除 ================= */
-/* 彻底清除资料库与插件/自定义页面顶部横条纯黑实体背景与 ::before / ::after 伪元素暗色遮罩 */
+/* ================= 11. 资料库、插件与技能、图像与站点页透明穿透与头部黑条消除 ================= */
+/* 彻底清除资料库与插件/技能/站点页面顶部吸顶横条纯黑实体背景与 ::before / ::after 伪元素暗色遮罩（兼容新版 shell- 与旧版 _shell_） */
 div[class*="_shell_"],
 div[class*="_shell_"]::before,
 div[class*="_shell_"]::after,
+div[class*="shell-"],
+div[class*="shell-"]::before,
+div[class*="shell-"]::after,
 header[class*="_shell_"],
 header[class*="_shell_"]::before,
 header[class*="_shell_"]::after,
+header[class*="shell-"],
+header[class*="shell-"]::before,
+header[class*="shell-"]::after,
 div[class*="_headerRow_"],
 div[class*="_headerRow_"]::before,
 div[class*="_headerRow_"]::after,
+div[class*="headerRow-"],
+div[class*="headerRow-"]::before,
+div[class*="headerRow-"]::after,
 div[class*="_title_"],
 div[class*="_titleContent_"],
+div[class*="titleContent-"],
+div[class*="directoryShell-"],
 div[class*="_actions_"],
 div[class*="_toolbar_"],
 div[class*="_search_"],
-div[class*="_shell_"] div[class*="_content_"] {
+div[class*="_shell_"] div[class*="_content_"],
+div[class*="shell-"] :is([class*="title-"], [class*="actions-"], [class*="toolbar-"], [class*="search-"], [class*="Search-"], [class*="content-"]) {
     background: transparent !important;
     background-color: transparent !important;
     backdrop-filter: none !important;
@@ -942,8 +1160,9 @@ div[class*="_shell_"] div[class*="_content_"] {
     border-color: transparent !important;
 }
 
-/* 顶部搜索输入框（搜索资料库、搜索插件）微光半透明高雅美化 */
+/* 顶部搜索输入框（搜索资料库、搜索插件/技能/站点）微光半透明高雅美化 */
 div[class*="_shell_"] input,
+div[class*="shell-"] input,
 div[class*="_search_"] input,
 div[class*="_shell_"] div[class*="_content_"] input {
     background-color: rgba(255, 255, 255, 0.08) !important;
@@ -955,6 +1174,7 @@ div[class*="_shell_"] div[class*="_content_"] input {
 }
 
 div[class*="_shell_"] input:focus,
+div[class*="shell-"] input:focus,
 div[class*="_search_"] input:focus,
 div[class*="_shell_"] div[class*="_content_"] input:focus {
     background-color: rgba(255, 255, 255, 0.14) !important;
@@ -963,6 +1183,8 @@ div[class*="_shell_"] div[class*="_content_"] input:focus {
 
 /* 顶部次级操作按钮（网格/列表切换、刷新、设置、筛选等）微光半透明美化 */
 div[class*="_shell_"] button.button-toolbar:not([class*="bg-primary-solid"]),
+div[class*="shell-"] button.button-toolbar:not([class*="bg-primary-solid"]),
+div[class*="shell-"] button[class*="rounded-button-toolbar"]:not([class*="bg-primary-solid"]),
 div[class*="_toolbar_"] button.button-toolbar:not([class*="bg-primary-solid"]),
 div[class*="_actions_"] button.button-toolbar:not([class*="bg-primary-solid"]),
 div[class*="_shell_"] div[class*="_content_"] button.button-toolbar:not([class*="bg-primary-solid"]) {
@@ -973,6 +1195,8 @@ div[class*="_shell_"] div[class*="_content_"] button.button-toolbar:not([class*=
 }
 
 div[class*="_shell_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
+div[class*="shell-"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
+div[class*="shell-"] button[class*="rounded-button-toolbar"]:not([class*="bg-primary-solid"]):hover,
 div[class*="_toolbar_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
 div[class*="_actions_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover,
 div[class*="_shell_"] div[class*="_content_"] button.button-toolbar:not([class*="bg-primary-solid"]):hover {
@@ -982,6 +1206,7 @@ div[class*="_shell_"] div[class*="_content_"] button.button-toolbar:not([class*=
 
 /* 资料库与插件主操作高亮按钮（新建、添加）高保真微光白胶囊 */
 div[class*="_shell_"] button[class*="bg-primary-solid"],
+div[class*="shell-"] button[class*="bg-primary-solid"],
 div[class*="_actions_"] button[class*="bg-primary-solid"],
 div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-solid"] {
     background-color: rgba(255, 255, 255, 0.90) !important;
@@ -992,6 +1217,7 @@ div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-solid"] 
 }
 
 div[class*="_shell_"] button[class*="bg-primary-solid"]:hover,
+div[class*="shell-"] button[class*="bg-primary-solid"]:hover,
 div[class*="_actions_"] button[class*="bg-primary-solid"]:hover,
 div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-solid"]:hover {
     background-color: #ffffff !important;
@@ -1000,18 +1226,39 @@ div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-solid"]:
 
 /* 分类切换胶囊（推荐、收藏、文件夹、图像、全部 / 公开、个人）微光质感 */
 div[class*="_shell_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]),
+div[class*="shell-"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]),
 div[class*="_shell_"] div[class*="_content_"] button[class*="rounded-full"]:not([class*="bg-primary-solid"]) {
     border-radius: 9999px !important;
     transition: all 0.15s ease-out !important;
 }
 
 div[class*="_shell_"] button[class*="bg-primary-ghost-hover"],
+div[class*="shell-"] button[class*="bg-primary-ghost-hover"],
 div[class*="_shell_"] div[class*="_content_"] button[class*="bg-primary-ghost-hover"] {
     background-color: rgba(255, 255, 255, 0.14) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
     color: #ffffff !important;
+}
+
+/* 技能列表图标小方框与图像风格模板卡片：去除硬黑实体底，转为通透微光质感 */
+[data-app-shell-focus-area="main"] span.rounded-lg[class*="bg-surface-secondary"] {
+    background-color: rgba(255, 255, 255, 0.09) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+[data-app-shell-focus-area="main"] button.rounded-2xl[class*="bg-surface-secondary"],
+button[class*="group/use"][class*="bg-surface-secondary"] {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+button[class*="group/use"][class*="bg-surface-secondary"]:hover {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border-color: rgba(255, 255, 255, 0.24) !important;
 }
 
 /* ================= 12. 右侧边栏全景透明与子面板（文件预览、Markdown、查看审批、命令行）毛玻璃美化（排除内置浏览器与文档预览正文） ================= */
@@ -1072,12 +1319,15 @@ file-tree-container,
   background: transparent !important;
 }
 
-/* 面包屑路径条与顶部信息条透明穿透 */
+/* 面包屑路径条与顶部信息条透明穿透（兼容新版 header- / Header- / Toolbar- 与旧版 _header_） */
 [data-testid="viewer-header"],
 header._header_1oxlz_1,
 aside[data-app-shell-focus-area="right-panel"] header,
 aside[data-app-shell-focus-area="right-panel"] [class*="sticky"],
-aside[data-app-shell-focus-area="right-panel"] [class*="_header_"] {
+aside[data-app-shell-focus-area="right-panel"] [class*="_header_"],
+aside[data-app-shell-focus-area="right-panel"] [class*="header-"],
+aside[data-app-shell-focus-area="right-panel"] [class*="Header-"],
+aside[data-app-shell-focus-area="right-panel"] [class*="Toolbar-"] {
   background-color: transparent !important;
   background: transparent !important;
 }
@@ -1089,7 +1339,8 @@ aside[data-app-shell-focus-area="right-panel"] [class*="_header_"] {
 [data-composer-markdown],
 .vscode-markdown,
 .prose,
-[class*="_markdown_"] {
+[class*="_markdown_"],
+[class*="markdown-"] {
   background-color: transparent !important;
   background: transparent !important;
 }
