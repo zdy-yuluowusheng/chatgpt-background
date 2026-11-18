@@ -32,7 +32,11 @@ function replaceWallpaper(imagePath, cssPath, darkenOpacity = 0.50) {
 
     const base64Data = imgBuffer.toString('base64');
     const dataUrl = `data:${mimeType};base64,${base64Data}`;
-    console.log(`[2/3] 图片 Base64 转码完成，原始体积: ${(imgBuffer.length / 1024 / 1024).toFixed(2)} MB`);
+    const sizeMb = imgBuffer.length / 1024 / 1024;
+    console.log(`[2/3] 图片 Base64 转码完成，原始体积: ${sizeMb.toFixed(2)} MB`);
+    if (sizeMb > 3) {
+      console.warn(`[性能提示] 当前壁纸原图体积较大 (${sizeMb.toFixed(2)} MB)，建议先转换为 WebP 或高质量 JPG（1~2 MB 以内）以保持高刷流畅度！`);
+    }
 
     if (!fs.existsSync(cssPath)) {
       throw new Error(`找不到目标 CSS 文件: ${cssPath}`);

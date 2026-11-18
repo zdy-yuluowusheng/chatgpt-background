@@ -2,10 +2,11 @@
  * @file 运行时注入引擎.mjs
  * @description 基于 Chrome DevTools Protocol (CDP) 的轻量级运行时主题注入守护引擎。
  *              通过 loopback WebSocket 在渲染进程内存中动态挂载毛玻璃 CSS 样式表，
- *              实现零破坏性、抗更新、支持 CSS 即时热重载（Hot-Reload）的定制体验。
+ *              并采用内容指纹缓存与轻量 DOM 探针机制，消除路由切换时的重复大体积传输卡顿。
  * @author Antigravity Assistant
  */
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,12 +23,19 @@ const CONFIG = {
   cssPath: path.resolve(__dirname, '../主题样式/透明UI主题.css'),
 };
 
+// 内存缓存最新的 CSS 文本及其指纹哈希，避免每次导航重复读取磁盘与计算哈希
+const cssCache = {
+  mtimeMs: 0,
+  css: '',
+  hash: '',
+};
+
 /**
  * 异步请求 CDP HTTP 接口，获取当前可用的 targets 或 version 信息
  * 
  * @param {string} endpoint - 目标端点路径（如 '/json/list' 或 '/json/version'）
  * @returns {Promise<Array<object>|object|null>} 响应解析后的 JSON 对象，网络不可达时返回 null
- * @throws {Error} 当网络连接严重异常或 JSON 格式非法时处理错误
+ * @throws {Error} 当网络连接严重异常或 JSON 格式非法时处理错误并返回 null
  */
 async function queryCdpEndpoint(endpoint) {
   try {
@@ -41,41 +49,76 @@ async function queryCdpEndpoint(endpoint) {
 }
 
 /**
- * 读取当前本地的主题 CSS 文件内容
+ * 读取并缓存本地主题 CSS 文件内容及其 SHA-256 指纹哈希
  * 
  * @param {string} filePath - 本地 CSS 文件路径
- * @returns {string} 完整的 CSS 文本内容
- * @throws {Error} 文件不存在或读取异常时抛出错误
+ * @param {boolean} [forceRefresh=false] - 是否忽略 mtime 缓存强制从磁盘重新读取
+ * @returns {{css: string, hash: string}} 包含完整 CSS 文本与 16 位哈希指纹的对象
+ * @throws {Error} 内部捕获读取异常并在文件缺失时打印错误，返回空字符串状态
  */
-function readCurrentCss(filePath) {
+function getThemeCssState(filePath, forceRefresh = false) {
   try {
     if (!fs.existsSync(filePath)) {
       throw new Error(`主题样式表不存在: ${filePath}`);
     }
-    return fs.readFileSync(filePath, 'utf8');
+    const stat = fs.statSync(filePath);
+    if (!forceRefresh && cssCache.css && cssCache.mtimeMs === stat.mtimeMs) {
+      return { css: cssCache.css, hash: cssCache.hash };
+    }
+
+    const css = fs.readFileSync(filePath, 'utf8');
+    if (!css) {
+      return { css: '', hash: '' };
+    }
+
+    const hash = crypto.createHash('sha256').update(css).digest('hex').slice(0, 16);
+    cssCache.mtimeMs = stat.mtimeMs;
+    cssCache.css = css;
+    cssCache.hash = hash;
+    return { css, hash };
   } catch (err) {
     console.error(`[读取CSS异常] ${err.message}`);
-    return '';
+    return { css: cssCache.css || '', hash: cssCache.hash || '' };
   }
 }
 
 /**
- * 构造注入到页面的 JavaScript 执行代码
+ * 构造轻量 DOM 样式就绪探针脚本（仅数百字节，用于 SPA 路由跳转时免传输全量 CSS）
+ * 
+ * @param {string} styleId - DOM 树中 style 标签的唯一标识 ID
+ * @param {string} themeHash - 当前主题样式的 16 位指纹哈希
+ * @returns {string} 可执行的轻量级探测 JavaScript 代码片段
+ * @throws {void} 无异常抛出
+ */
+function buildProbeScript(styleId, themeHash) {
+  const serializedId = JSON.stringify(styleId);
+  const serializedHash = JSON.stringify(themeHash);
+  return `(() => {
+    const el = document.getElementById(${serializedId});
+    return !!(el && el.getAttribute('data-theme-hash') === ${serializedHash});
+  })();`;
+}
+
+/**
+ * 构造向页面全量写入样式的 JavaScript 执行代码
  * 
  * @param {string} cssContent - 待挂载的 CSS 样式代码
  * @param {string} styleId - DOM 树中 style 标签的唯一标识 ID
+ * @param {string} themeHash - 当前主题样式的 16 位指纹哈希
  * @returns {string} 序列化后的可执行 JavaScript 代码片段
  * @throws {void} 无异常抛出
  */
-function buildInjectionScript(cssContent, styleId) {
+function buildInjectionScript(cssContent, styleId, themeHash) {
   const serializedCss = JSON.stringify(cssContent);
   const serializedId = JSON.stringify(styleId);
+  const serializedHash = JSON.stringify(themeHash);
 
   return `
     (() => {
       try {
         const id = ${serializedId};
         const css = ${serializedCss};
+        const hash = ${serializedHash};
         let style = document.getElementById(id);
         if (!style) {
           style = document.createElement('style');
@@ -83,10 +126,11 @@ function buildInjectionScript(cssContent, styleId) {
           style.setAttribute('data-injected-by', 'chatgpt-background-cdp');
           (document.head || document.documentElement).appendChild(style);
         }
-        if (style.textContent !== css) {
+        if (style.getAttribute('data-theme-hash') !== hash || style.textContent !== css) {
           style.textContent = css;
+          style.setAttribute('data-theme-hash', hash);
         }
-        return { success: true, updated: true };
+        return { success: true, updated: true, hash };
       } catch (err) {
         return { success: false, error: err.message };
       }
@@ -103,6 +147,7 @@ class PageInjectorSession {
    * 
    * @param {object} target - CDP target 描述对象（包含 id, title, webSocketDebuggerUrl 等）
    * @param {string} cssPath - CSS 文件路径
+   * @throws {void} 无异常抛出
    */
   constructor(target, cssPath) {
     this.target = target;
@@ -111,13 +156,16 @@ class PageInjectorSession {
     this.msgId = 1;
     this.callbacks = new Map();
     this.isConnected = false;
+    this.isInjecting = false;
+    this.pendingForce = null;
+    this.navDebounceTimer = null;
   }
 
   /**
    * 启动 WebSocket 连接并初始化 Page/Runtime 域
    * 
    * @returns {Promise<boolean>} 连接并就绪返回 true，失败返回 false
-   * @throws {Error} 捕获底层网络异常
+   * @throws {Error} 捕获底层 WebSocket 连接异常并返回 false
    */
   connect() {
     return new Promise((resolve) => {
@@ -127,13 +175,13 @@ class PageInjectorSession {
         this.ws.onopen = () => {
           this.isConnected = true;
           console.log(`[连接成功] 已连上页面: "${this.target.title || 'ChatGPT/Codex'}"`);
-          
+
           // 开启 Page 和 Runtime 事件监听
           this.sendCommand('Runtime.enable');
           this.sendCommand('Page.enable');
 
-          // 立即注入样式
-          this.injectStyle();
+          // 首次连接执行注入校验
+          this.injectStyle(false);
           resolve(true);
         };
 
@@ -146,11 +194,13 @@ class PageInjectorSession {
               this.callbacks.delete(data.id);
               cb(data.result);
             }
-            // 路由导航或页面重载时重新注样式
-            if (data.method === 'Page.loadEventFired' || 
-                data.method === 'Page.navigatedWithinDocument' ||
-                data.method === 'Page.frameNavigated') {
-              this.injectStyle();
+            // 路由导航或页面重载时合并防抖并以轻量探针按需补注
+            if (
+              data.method === 'Page.loadEventFired' ||
+              data.method === 'Page.navigatedWithinDocument' ||
+              data.method === 'Page.frameNavigated'
+            ) {
+              this.scheduleNavigationCheck();
             }
           } catch {
             // 忽略解析错误
@@ -164,6 +214,14 @@ class PageInjectorSession {
 
         this.ws.onclose = () => {
           this.isConnected = false;
+          if (this.navDebounceTimer) {
+            clearTimeout(this.navDebounceTimer);
+            this.navDebounceTimer = null;
+          }
+          for (const cb of this.callbacks.values()) {
+            try { cb(null); } catch {}
+          }
+          this.callbacks.clear();
           console.log(`[连接断开] 页面会话已关闭: ${this.target.id}`);
         };
       } catch {
@@ -173,12 +231,28 @@ class PageInjectorSession {
   }
 
   /**
+   * 合并短时间内的多次导航事件，避免连续触发冗余校验
+   * 
+   * @returns {void} 无返回值
+   * @throws {void} 无异常抛出
+   */
+  scheduleNavigationCheck() {
+    if (this.navDebounceTimer) {
+      clearTimeout(this.navDebounceTimer);
+    }
+    this.navDebounceTimer = setTimeout(() => {
+      this.navDebounceTimer = null;
+      this.injectStyle(false);
+    }, 60);
+  }
+
+  /**
    * 向当前渲染窗口发送 CDP 请求协议帧
    * 
    * @param {string} method - CDP 方法名（如 'Runtime.evaluate'）
    * @param {object} [params={}] - 方法调用参数
-   * @returns {Promise<object>} 返回方法执行结果
-   * @throws {Error} 异常时返回 null
+   * @returns {Promise<object|null>} 返回方法执行结果，未连接或超时时返回 null
+   * @throws {void} 异常时通过返回 null 降级处理
    */
   sendCommand(method, params = {}) {
     return new Promise((resolve) => {
@@ -186,37 +260,80 @@ class PageInjectorSession {
         return resolve(null);
       }
       const id = this.msgId++;
-      this.callbacks.set(id, resolve);
+      const timer = setTimeout(() => {
+        if (this.callbacks.has(id)) {
+          this.callbacks.delete(id);
+          resolve(null);
+        }
+      }, 8000);
+      this.callbacks.set(id, (res) => {
+        clearTimeout(timer);
+        resolve(res);
+      });
       this.ws.send(JSON.stringify({ id, method, params }));
     });
   }
 
   /**
-   * 执行样式注入
+   * 执行样式注入（非强制模式下优先发送轻量探针，哈希一致则跳过全量 CSS 推送）
    * 
-   * @returns {Promise<void>}
-   * @throws {void}
+   * @param {boolean} [forceRefresh=false] - 是否强制刷新磁盘 CSS 并跳过探针直接下发
+   * @returns {Promise<void>} 异步执行完成
+   * @throws {void} 内部安全处理空样式与通信失败
    */
-  async injectStyle() {
-    const css = readCurrentCss(this.cssPath);
-    if (!css) return;
+  async injectStyle(forceRefresh = false) {
+    if (!this.isConnected) return;
 
-    const script = buildInjectionScript(css, CONFIG.styleId);
-    await this.sendCommand('Runtime.evaluate', {
-      expression: script,
-      returnByValue: true,
-      userGesture: true,
-      awaitPromise: true,
-    });
-    console.log(`[样式已挂载] 成功更新页面样式: "${this.target.title || '主窗口'}" (${new Date().toLocaleTimeString()})`);
+    if (this.isInjecting) {
+      this.pendingForce = (this.pendingForce === true) || forceRefresh;
+      return;
+    }
+
+    this.isInjecting = true;
+    try {
+      const { css, hash } = getThemeCssState(this.cssPath, forceRefresh);
+      if (!css || !hash) return;
+
+      // 先发送轻量探针核验页面上是否已经挂载同哈希样式，SPA 跳转时 0 延迟跳过全量发送
+      if (!forceRefresh) {
+        const probeRes = await this.sendCommand('Runtime.evaluate', {
+          expression: buildProbeScript(CONFIG.styleId, hash),
+          returnByValue: true,
+        });
+        if (probeRes?.result?.value === true) {
+          return;
+        }
+      }
+
+      const script = buildInjectionScript(css, CONFIG.styleId, hash);
+      await this.sendCommand('Runtime.evaluate', {
+        expression: script,
+        returnByValue: true,
+        userGesture: true,
+        awaitPromise: true,
+      });
+      console.log(`[样式已挂载] 成功更新页面样式: "${this.target.title || '主窗口'}" [${hash}] (${new Date().toLocaleTimeString()})`);
+    } finally {
+      this.isInjecting = false;
+      if (this.pendingForce !== null) {
+        const nextForce = this.pendingForce;
+        this.pendingForce = null;
+        this.injectStyle(nextForce);
+      }
+    }
   }
 
   /**
-   * 关闭当前 WebSocket 会话
+   * 关闭当前 WebSocket 会话并清理定时器
    * 
-   * @returns {void}
+   * @returns {void} 无返回值
+   * @throws {void} 内部安全关闭连接
    */
   dispose() {
+    if (this.navDebounceTimer) {
+      clearTimeout(this.navDebounceTimer);
+      this.navDebounceTimer = null;
+    }
     if (this.ws) {
       try {
         this.ws.close();
@@ -233,6 +350,8 @@ class PageInjectorSession {
 class CdpThemeInjectorDaemon {
   /**
    * 初始化守护引擎
+   * 
+   * @throws {void} 无异常抛出
    */
   constructor() {
     this.activeSessions = new Map(); // targetId -> PageInjectorSession
@@ -242,8 +361,8 @@ class CdpThemeInjectorDaemon {
   /**
    * 启动守护引擎主循环
    * 
-   * @returns {Promise<void>}
-   * @throws {Error} 捕获全局未捕获异常
+   * @returns {Promise<void>} 异步启动结果
+   * @throws {Error} 捕获轮询或监控启动中的异常
    */
   async start() {
     console.log('==========================================================');
@@ -252,6 +371,9 @@ class CdpThemeInjectorDaemon {
     console.log(`监听端点: http://${CONFIG.host}:${CONFIG.port}`);
     console.log(`主题文件: ${CONFIG.cssPath}`);
     console.log('正在等待客户端启动并开启调试接口...\n');
+
+    // 预加载缓存
+    getThemeCssState(CONFIG.cssPath, true);
 
     // 1. 启动 CSS 文件变更监听（热重载）
     this.setupCssFileWatcher();
@@ -268,20 +390,21 @@ class CdpThemeInjectorDaemon {
   /**
    * 设置本地 CSS 样式表文件的文件监听器，变更时全量推送热更新
    * 
-   * @returns {void}
+   * @returns {void} 无返回值
    * @throws {void} 内部捕获 watcher 异常
    */
   setupCssFileWatcher() {
     try {
       let debounceTimer = null;
       fs.watch(CONFIG.cssPath, (eventType) => {
-        if (eventType === 'change') {
+        if (eventType === 'change' || eventType === 'rename') {
           if (debounceTimer) clearTimeout(debounceTimer);
           debounceTimer = setTimeout(() => {
             console.log('\n[热重载触发] 检测到主题 CSS 文件被修改，正在向所有窗口推送最新样式...');
+            getThemeCssState(CONFIG.cssPath, true);
             for (const session of this.activeSessions.values()) {
               if (session.isConnected) {
-                session.injectStyle();
+                session.injectStyle(true);
               }
             }
           }, 300);
@@ -296,8 +419,8 @@ class CdpThemeInjectorDaemon {
   /**
    * 轮询目标端口，检索当前活跃的界面 target 并接入
    * 
-   * @returns {Promise<void>}
-   * @throws {void}
+   * @returns {Promise<void>} 异步轮询完成
+   * @throws {void} 内部捕获请求与连接异常
    */
   async pollTargets() {
     if (this.isPolling) return;
