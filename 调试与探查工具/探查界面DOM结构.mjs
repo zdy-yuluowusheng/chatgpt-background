@@ -130,7 +130,14 @@ async function main() {
     process.exit(1);
   }
 
-  const page = targets.find((t) => t.type === 'page' && t.webSocketDebuggerUrl);
+  const page = targets.find(
+    (t) =>
+      t.type === 'page' &&
+      typeof t.url === 'string' &&
+      t.url.startsWith('app://-/index.html') &&
+      !t.url.includes('avatar-overlay') &&
+      t.webSocketDebuggerUrl
+  );
   if (!page) {
     console.error('[错误] 找到 CDP 端口，但未检索到可交互的主界面渲染页面 (type=page)。');
     process.exit(1);

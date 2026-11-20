@@ -440,10 +440,32 @@ class CdpThemeInjectorDaemon {
         return;
       }
 
-      // 筛选有效的主页面渲染目标（type 为 page，且具有调试 WebSocket URL）
-      const validPages = targets.filter((t) => {
-        return t.webSocketDebuggerUrl && (t.type === 'page' || t.type === 'webview');
-      });
+      /**
+       * 判断 CDP 调试目标是否为需要注入透明主题的主应用窗口，排除悬浮宠物窗与内置/认证 WebView。
+       * @param {object} target - CDP `/json/list` 返回的调试目标对象。
+       * @returns {boolean} 仅当目标为主窗口 `app://-/index.html` 页面且非悬浮窗路由时返回 true。
+       * @throws {TypeError} 当目标对象缺失或格式无效时抛出异常。
+       */
+      const isEligibleThemeTarget = (target) => {
+        if (!target || typeof target !== 'object') {
+          throw new TypeError('调试目标 target 必须为非空对象');
+        }
+        if (!target.webSocketDebuggerUrl || target.type !== 'page') {
+          return false;
+        }
+        const url = typeof target.url === 'string' ? target.url : '';
+        if (!url.startsWith('app://-/index.html')) {
+          return false;
+        }
+        // 新版 26.1117 引入独立透明桌面伙伴悬浮窗 (?initialRoute=%2Favatar-overlay)，严禁注入全屏壁纸
+        if (url.includes('avatar-overlay')) {
+          return false;
+        }
+        return true;
+      };
+
+      // 筛选有效的主窗口渲染目标（仅作用于主窗口 page，排除 /avatar-overlay 与 webview）
+      const validPages = targets.filter((t) => isEligibleThemeTarget(t));
 
       const currentTargetIds = new Set(validPages.map((t) => t.id));
 
