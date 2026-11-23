@@ -1666,7 +1666,7 @@ section.codex-docx-preview span,
   -webkit-backdrop-filter: none !important;
 }
 
-/* 12.7 查看审批与浮动操作栏（编辑、拒绝、接受等胶囊条）毛玻璃美化（严格排除全屏遮罩与文档正文） */
+/* 12.7 查看审批与浮动操作栏（编辑、拒绝、接受等底部 border-t 胶囊条）毛玻璃美化（严格限定底部 border-t 容器，严禁误伤顶部“打开”复合按钮及文件目录顶部行） */
 aside[data-app-shell-focus-area="right-panel"] div.flex.shrink-0.justify-end.border-t.border-default.bg-surface,
 aside[data-app-shell-focus-area="right-panel"] [class*="border-t"][class*="bg-surface"]:not(:has(webview), :has(iframe)) {
   background-color: transparent !important;
@@ -1674,7 +1674,7 @@ aside[data-app-shell-focus-area="right-panel"] [class*="border-t"][class*="bg-su
   border-top-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-aside[data-app-shell-focus-area="right-panel"] div:has(> button[class*="button-toolbar"]):not([data-new-tab-scroll-root] div, [data-app-shell-header-toolbar] div, .flex.items-center.justify-between:not([class*="border-t"])) {
+aside[data-app-shell-focus-area="right-panel"] div[class*="border-t"]:has(> button[class*="button-toolbar"]):not([data-new-tab-scroll-root] div, [data-app-shell-header-toolbar] div) {
   background-color: rgba(18, 22, 28, 0.45) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
@@ -1682,7 +1682,13 @@ aside[data-app-shell-focus-area="right-panel"] div:has(> button[class*="button-t
   border-radius: 12px 12px 0 0 !important;
 }
 
-/* 新版右侧面板 New Tab 悬浮地址/搜索胶囊（controlSurface）与内部地址输入框：外框转雾化玻璃、内框去双层框 */
+/* 【核心修复】消除右侧文件预览顶部面包屑胶囊（nav[aria-label="文件路径"]）在 Windows 1.5x 缩放下因亚像素舍入误差引发的 "... /" 无限振荡抽搐 */
+aside[data-app-shell-focus-area="right-panel"] nav[aria-label="文件路径"] > div[aria-hidden="true"],
+aside[data-app-shell-focus-area="right-panel"] [data-viewer-header-item] nav > div[aria-hidden="true"] {
+  border-inline-end: 1px solid transparent !important;
+}
+
+/* 新版右侧面板顶部悬浮胶囊（controlSurface）与内部复合按钮（打开按钮）：外层单层雾化玻璃，内部 compound 容器去黑底去重框 */
 aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="controlSurface-"] {
   background-image: none !important;
   background-color: rgba(255, 255, 255, 0.08) !important;
@@ -1695,6 +1701,22 @@ aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="co
 aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="controlSurface-"]:focus-within {
   background-color: rgba(255, 255, 255, 0.13) !important;
   border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+aside[data-app-shell-focus-area="right-panel"] div[class*="compound-"][class*="controlSurface-"],
+aside[data-app-shell-focus-area="right-panel"] [data-file-tab-action="open-in-app"] div[class*="compound-"],
+aside[data-app-shell-focus-area="right-panel"] button[class*="compoundControl-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+aside[data-app-shell-focus-area="right-panel"] button[class*="compoundControl-"]:hover {
+  background-color: rgba(255, 255, 255, 0.10) !important;
 }
 
 aside[data-app-shell-focus-area="right-panel"] input[data-browser-sidebar-address-input] {
@@ -1734,12 +1756,47 @@ aside[data-app-shell-focus-area="right-panel"] input[data-browser-sidebar-addres
   color: #f0f0f0 !important;
 }
 
-/* 12.9 文件树内搜索筛选输入框微光半透明美化 */
+/* 12.9 文件树顶部目录栏与搜索筛选框纯透明微光美化（彻底去除黑底与双层内框） */
+aside[data-app-shell-focus-area="right-panel"] div:has(> button[aria-label="选择文件树根目录"]),
+aside[data-app-shell-focus-area="right-panel"] div:has(#workspace-directory-tree-search):not(:has(> #workspace-directory-tree-search)) {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+aside[data-app-shell-focus-area="right-panel"] div:has(> button[aria-label="选择文件树根目录"]) {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+aside[data-app-shell-focus-area="right-panel"] button[aria-label="选择文件树根目录"] {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+}
+
+aside[data-app-shell-focus-area="right-panel"] button[aria-label="选择文件树根目录"]:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+aside[data-app-shell-focus-area="right-panel"] div:has(> input[placeholder*="筛选"]),
+aside[data-app-shell-focus-area="right-panel"] div:has(> input[placeholder*="Filter"]),
+aside[data-app-shell-focus-area="right-panel"] div:has(> #workspace-directory-tree-search) {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+}
+
 aside[data-app-shell-focus-area="right-panel"] input[placeholder*="筛选"],
 aside[data-app-shell-focus-area="right-panel"] input[placeholder*="Filter"],
-aside[data-app-shell-focus-area="right-panel"] div:has(> input[placeholder*="筛选"]) {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+aside[data-app-shell-focus-area="right-panel"] #workspace-directory-tree-search {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   color: #ffffff !important;
 }
 
