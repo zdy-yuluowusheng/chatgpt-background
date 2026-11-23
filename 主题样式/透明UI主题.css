@@ -1818,3 +1818,27 @@ div:has(> iframe:not([aria-hidden="true"], [inert], [src*="runner.html"])) {
   --color-surface: #1e1e1e !important;
   --app-shell-panel-background: #1e1e1e !important;
 }
+
+/* 12.11 右侧扩展栏文件树与语义状态颜色高对比度优化（方案一：亮琥珀金 + 极浅薄荷绿 + 文字微阴影） */
+aside[data-app-shell-focus-area="right-panel"]:not(:has(webview:not([aria-hidden="true"], [inert])), :has(iframe:not([aria-hidden="true"], [inert], [src*="runner.html"]))) {
+  --color-text-info: #FFD166 !important;
+  --color-text-success: #A7F3D0 !important;
+  --app-color-text-success: #A7F3D0 !important;
+  --color-blue: #FFD166 !important;
+  --color-green: #A7F3D0 !important;
+  --color-codex-git-added: #A7F3D0 !important;
+  --color-blue-400: #FFD166 !important;
+  --blue-400: #FFD166 !important;
+  --color-blue-500: #FBBF24 !important;
+  --blue-500: #FBBF24 !important;
+  --color-green-400: #A7F3D0 !important;
+  --green-400: #A7F3D0 !important;
+  --color-green-500: #6EE7B7 !important;
+  --green-500: #6EE7B7 !important;
+  --color-green-600: #A7F3D0 !important;
+  --green-600: #A7F3D0 !important;
+}
+
+aside[data-app-shell-focus-area="right-panel"] div[class*="border-l"]:has(#workspace-directory-tree-search) {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
