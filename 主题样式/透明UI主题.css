@@ -1688,8 +1688,10 @@ aside[data-app-shell-focus-area="right-panel"] [data-viewer-header-item] nav > d
   border-inline-end: 1px solid transparent !important;
 }
 
-/* 新版右侧面板顶部悬浮胶囊（controlSurface）与内部复合按钮（打开按钮）：外层单层雾化玻璃，内部 compound 容器去黑底去重框 */
-aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="controlSurface-"] {
+/* 新版右侧面板顶部悬浮胶囊（controlSurface 与 data-control-group 胶囊组）及内部复合按钮：外层单层雾化玻璃，彻底去除 ::before 深黑渐变底与双层框 */
+aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="controlSurface-"],
+aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="group-"]::before,
+aside[data-app-shell-focus-area="right-panel"] [data-control-group][class*="capsule-"]::before {
   background-image: none !important;
   background-color: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.16) !important;
@@ -1698,7 +1700,9 @@ aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="co
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
-aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="controlSurface-"]:focus-within {
+aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="controlSurface-"]:focus-within,
+aside[data-app-shell-focus-area="right-panel"] div[class*="capsule-"][class*="group-"]:focus-within::before,
+aside[data-app-shell-focus-area="right-panel"] [data-control-group][class*="capsule-"]:focus-within::before {
   background-color: rgba(255, 255, 255, 0.13) !important;
   border-color: rgba(255, 255, 255, 0.28) !important;
 }
